@@ -2,6 +2,7 @@
 import { Pivot } from '../PivotTable/Pivot.ts';
 import { PivotOptions } from '../PivotTable/PivotOptions';
 import { data } from '../PivotTable/data';
+import PivotRow from './PivotRow.vue';
 var options = new PivotOptions({
     canvas: 'cc',
     fields: [
@@ -55,11 +56,8 @@ pivot.load(data);
 </script>
 <template>
     <table>
-        <thead>
-            <tr v-for="head in pivot.rowHeaders">
-                <td>{{ head.field.title }}</td>
-            </tr>
-        </thead>
+        <tr v-for="cell in pivot.view">
+            <PivotRow :cell="cell"></PivotRow>
+        </tr>
     </table>
-
 </template>

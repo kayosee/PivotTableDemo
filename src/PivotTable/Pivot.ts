@@ -36,7 +36,7 @@ export class Pivot {
 
         //this.view = this.join(this.view);
         //this.view = this.filter(this.view, valueFields);
-        this.transform(fields, this.options.values, this.view);
+        this.view = this.transform(fields, this.options.values, this.view);
 
     }
     private convert(data: Array<any>, fields: Array<Field>): Array<any> {
@@ -135,6 +135,7 @@ export class Pivot {
         let keys = this.extract(first.name, data);
         for (let key of keys) {
             let child = new GroupCell(first.name, key, first.style, false);
+            child.length = data.filter(f => f[first.name] == key).length;
             for (let value of values) {
                 let valueCell = new TotalCell(value.name, value.compute(data.filter(f => f[first.name] == key)), value.style, false);
                 child.children.push(valueCell);
@@ -152,6 +153,7 @@ export class Pivot {
         }
 
         console.log(result);
+        return result;
 
     }
 
@@ -163,11 +165,13 @@ export class Pivot {
 
         for (let key of keys) {
             let child = new GroupCell(path[index].name, key, path[index].style, false);
+            src = src.filter(f => f[path[index].name] == key);
+            child.length = src.length;
             for (let value of values) {
                 let valueCell = new TotalCell(value.name, value.compute(src), value.style, false);
                 child.children.push(valueCell);
             }
-            this.fill(path, index + 1, child, src.filter(f => f[path[index].name] == key), values);
+            this.fill(path, index + 1, child, src, values);
             cell.children.push(child);
         }
     }
