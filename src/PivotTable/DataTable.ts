@@ -17,8 +17,11 @@ export class DataTable {
             this.data.push(temp);
         }
     }
-    get(row: number, field: string) {
+    getByName(row: number, field: string) {
         return this.data[row][field];
+    }
+    getByIndex(row:number,col:number){
+        return this.data[row][this.columns[col]];
     }
     set(row: number, field: string, value: any) {
         if (row >= this.data.length)
@@ -53,6 +56,19 @@ export class DataTable {
             }
         }
 
+        return temp;
+    }
+
+    rotate(): DataTable {
+        let cols = this.data.map((_value, index) => index.toString());
+        let temp = new DataTable(...cols);
+        for (let i = 0; i < this.columns.length; i++) {
+            let composite: any = {};
+            for (let j = 0; j < this.data.length; j++) {                
+                composite[j] = this.getByIndex(j, i);
+            }
+            temp.add(composite);
+        }
         return temp;
     }
 }
