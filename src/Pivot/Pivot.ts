@@ -1,6 +1,5 @@
 
 
-import { Cell } from "./Cells/Cell";
 import { ColumnHeader } from "./Headers/ColumnHeader";
 import { DataTable } from "./DataTable";
 import { DataType } from "./Enums/DataType";
@@ -16,9 +15,8 @@ export class Pivot {
 
     rowHeaders: Array<RowHeader[]> = [];
     columnHeaders: Array<ColumnHeader[]> = [];
-    cells: Cell[] = [];
     data: Array<any> = [];
-    view: Array<Array<ValueCell>> = [];
+    cells: Array<Array<ValueCell>> = [];
     constructor(options: PivotOptions) {
         this.options = options;
     }
@@ -27,9 +25,8 @@ export class Pivot {
         this.data = this.convert(data, this.options.fields);
         let stringFields = this.options.filters.filter(f => this.options.fields.findIndex(s => s.name == f.name && s.type == DataType.String) > 0)
  
-        this.view = this.filter(this.data, stringFields);
-        this.view = this.compute(this.view);
-
+        this.cells = this.filter(this.data, stringFields);
+        this.cells = this.compute(this.cells);
     }
     private convert(data: Array<any>, fields: Array<Field>): Array<any> {
         let result: Array<any> = [];

@@ -1,9 +1,7 @@
 <script lang="ts" setup>
-import { Comparison } from '../PivotTable/Enums/Comparison.ts';
-import { Pivot } from '../PivotTable/Pivot.ts';
-import { PivotOptions } from '../PivotTable/PivotOptions';
-import { data } from '../PivotTable/data';
-import PivotRow from './PivotRow.vue';
+import { Pivot } from '../Pivot/Pivot.ts';
+import { PivotOptions } from '../Pivot/PivotOptions';
+import { data } from '../Pivot/data';
 var options = new PivotOptions({
     canvas: 'cc',
     fields: [
@@ -48,7 +46,12 @@ pivot.load(data);
 
 </script>
 <template>
-    <table class="pivot">
+    <div>
+        <ColumnHeaderArea :columns="pivot.columnHeaders"></ColumnHeaderArea>
+        <RowHeaderArea :rows="pivot.rowHeaders"></RowHeaderArea>
+        <CellArea :cells="pivot.cells"></CellArea>
+    </div>
+    <!-- <table class="pivot">
         <thead class="columns">
             <tr v-for="array in pivot.columnHeaders">
                 <th v-for="_row in pivot.options.rows"></th>
@@ -62,7 +65,7 @@ pivot.load(data);
                 <td v-for="row in pivot.view[index]">{{ row.value }}</td>
             </tr>
         </tbody>
-    </table>
+    </table> -->
 </template>
 <style scoped>
 
