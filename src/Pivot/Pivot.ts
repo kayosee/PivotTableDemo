@@ -9,6 +9,7 @@ import { DATA_TYPE_INVALID } from "./locale";
 import { PivotOptions } from "./PivotOptions";
 import { RowHeader } from "./Headers/RowHeader";
 import { ValueCell } from "./Cells/ValueCell";
+import { Marshal } from "./Utils/Marshal";
 
 export class Pivot {
     options: PivotOptions;
@@ -55,7 +56,7 @@ export class Pivot {
         return result;
     }
     private filter(data: Array<any>, filters: Array<FilterField>): Array<any> {
-        let result: Array<any> = JSON.parse(JSON.stringify(data));
+        let result: Array<any> = Marshal.clone(data);
         for (let i = 0; i < filters.length; i++) {
             let filter = filters[i];
             result = result.filter(f => filter.compare(f));
@@ -64,7 +65,7 @@ export class Pivot {
     }
     private compute(data: Array<any>): Array<Array<ValueCell>> {
 
-        let copy: Array<any> = JSON.parse(JSON.stringify(data));
+        let copy: Array<any> = Marshal.clone(data);
         let rowTable: DataTable | null = null;
         for (let x of this.options.rows.map(f => f.name)) {
             if (rowTable == null)
@@ -114,7 +115,8 @@ export class Pivot {
 
         let values: Array<ValueCell[]> = [];
         if (this.options.values.length > 0) {
-            for (let row of this.rowHeaders) {let valueRow: Array<ValueCell> = [];
+            for (let row of this.rowHeaders) {
+                let valueRow: Array<ValueCell> = [];
                 for (let col of this.columnHeaders[this.columnHeaders.length - 1]) {
                     
                     for (let value of this.options.values) {

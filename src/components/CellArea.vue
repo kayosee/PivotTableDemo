@@ -11,7 +11,20 @@ export default {
 }
 </script>
 <template>
-    <div v-for="cell in cells">
-        <span>{{ cell. }}</span>
-    </div>
+    <table class="frame">
+        <tr class="row" v-for="row in cells">
+            <td class="cell" v-for="cell in row">{{ cell.value }}</td>
+        </tr>
+    </table>
+    
+
 </template>
+
+<style scoped>
+.frame{
+    top: 0;
+    left:0;
+    position: absolute;
+    
+}
+</style>

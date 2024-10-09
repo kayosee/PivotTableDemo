@@ -1,6 +1,7 @@
 import { ValueField } from "../Fields/ValueField";
 import { ColumnHeader } from "../Headers/ColumnHeader";
 import { RowHeader } from "../Headers/RowHeader";
+import { Marshal } from "../Utils/Marshal";
 
 export class ValueCell {
     rowHeaders: Map<string, string>;
@@ -21,7 +22,7 @@ export class ValueCell {
         this.y = y;
     }
     compute(data: Array<any>) {
-        this.data = JSON.parse(JSON.stringify(data));
+        this.data = Marshal.clone(data);
         for (let header of this.rowHeaders) {
             this.data = this.data.filter(f => f[header[0]] == header[1]);
         }

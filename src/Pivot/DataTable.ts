@@ -1,4 +1,5 @@
 import { FIELD_NOT_EXISTS, OUT_OF_RANGE } from './locale';
+import { Marshal } from './Utils/Marshal';
 export class DataTable {
     columns: Array<string>;
     data: Array<any>;
@@ -33,7 +34,7 @@ export class DataTable {
             throw new Error(FIELD_NOT_EXISTS);
     }
     join(table: DataTable): DataTable {
-        let columns: Array<string> = JSON.parse(JSON.stringify(this.columns));
+        let columns: Array<string> = Marshal.clone(this.columns);
         for (let col of table.columns) {
             if (columns.find(f => f == col))
                 continue;

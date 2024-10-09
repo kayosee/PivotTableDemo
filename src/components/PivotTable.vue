@@ -1,7 +1,11 @@
 <script lang="ts" setup>
+import { ref } from 'vue';
 import { Pivot } from '../Pivot/Pivot.ts';
 import { PivotOptions } from '../Pivot/PivotOptions';
 import { data } from '../Pivot/data';
+import CellArea from './CellArea.vue'
+import ColumnHeaderArea from './ColumnHeaderArea.vue';
+import RowHeaderArea from './RowHeaderArea.vue';
 var options = new PivotOptions({
     canvas: 'cc',
     fields: [
@@ -44,55 +48,46 @@ var options = new PivotOptions({
 var pivot = new Pivot(options);
 pivot.load(data);
 
+let scrollTop = ref(0);
+let scrollLeft = ref(0);
+let onScroll = function (e: any) {
+    if (e.target != null) {
+        scrollTop.value = e.target.scrollTop
+        scrollLeft.value = e.target.scrollLeft;
+    }
+}
 </script>
 <template>
-    <div>
-        <ColumnHeaderArea :columns="pivot.columnHeaders"></ColumnHeaderArea>
-        <RowHeaderArea :rows="pivot.rowHeaders"></RowHeaderArea>
-        <CellArea :cells="pivot.cells"></CellArea>
-    </div>
-    <!-- <table class="pivot">
-        <thead class="columns">
-            <tr v-for="array in pivot.columnHeaders">
-                <th v-for="_row in pivot.options.rows"></th>
-                <th v-for="header in array">{{ header.value }}</th>
-            </tr>
-        </thead>
+    <table class="pivot">
+        <tr style="height: 30px;">
+            <td style="width:30%"></td>
+            <td class="holder columns" v-bind:scrollLeft="scrollLeft"><ColumnHeaderArea :headers="pivot.columnHeaders" :left="scrollLeft"></ColumnHeaderArea></td>
+        </tr>
+        <tr>
+            <td class="holder rows" v-bind:scrollTop="scrollTop"><RowHeaderArea :headers="pivot.rowHeaders" :top="scrollTop"></RowHeaderArea></td>
+            <td class="holder cells" v-on:scroll="onScroll"><CellArea :cells="pivot.cells"></CellArea></td>
+        </tr>
+    </table>
 
-        <tbody>
-            <tr v-for="(array, index) in pivot.rowHeaders">
-                <td class="row" v-for="header in array">{{ header.value }}</td>
-                <td v-for="row in pivot.view[index]">{{ row.value }}</td>
-            </tr>
-        </tbody>
-    </table> -->
 </template>
 <style scoped>
-
-.columns {
-    position: sticky;
-    top: 0;
-    /* 首行永远固定在左侧 */
-    z-index: 1;
-    width: 100%;
-    background-color: white;
-    overflow: auto;
+.holder{
+    position: relative;
+    padding: 0;
 }
-
-.row {
-    z-index: 2;
-    background-color: white;
+.columns,.rows{
+    overflow: hidden;
 }
-
 .pivot {
     font-size: 12px;
     border-collapse: collapse;
     table-layout: fixed;
     width: 100%;
+    height: 100vh;
 }
 
 td,th {
     border: 1px solid black;
-    width: 50%;
+    overflow: auto
 }
 </style>
