@@ -16,15 +16,16 @@ var options = new PivotOptions({
         { name: 'stall', title: '精度', type: 'string' },
         { name: 'pack', title: '包装', type: 'string' },
         { name: 'status', title: '状态', type: 'string' },
-        { name: 'end_worker', title: '工人', type: 'string' }
-
+        { name: 'end_worker', title: '工人', type: 'string' },
+        { name: 'route', title: '工艺路线', type: 'string' }
     ],
     columns: [
         { field: 'pack', style: {} },
         { field: 'stall', style: {} },
     ],
     rows: [
-        { field: 'end_worker', style: {} }
+        { field: 'route', style: {} },    
+        { field: 'end_worker', style: {} },        
     ],
     values: [
         {
@@ -58,19 +59,26 @@ let onScroll = function (e: any) {
 }
 </script>
 <template>
-    <table class="pivot">
+    <table class="pivot" :style="{ width: options.width + 'px', height: options.height + 'px' }">
         <tr style="height: 30px;">
-            <td style="width:30%"></td>
-            <td class="holder columns" v-bind:scrollLeft="scrollLeft"><ColumnHeaderArea :headers="pivot.columnHeaders" :left="scrollLeft"></ColumnHeaderArea></td>
+            <td></td>
+            <td style="width:70%" class="holder columns" v-bind:scrollLeft="scrollLeft">
+                <ColumnHeaderArea :headers="pivot.columnHeaders" :left="scrollLeft"></ColumnHeaderArea>
+            </td>
         </tr>
         <tr>
-            <td class="holder rows" v-bind:scrollTop="scrollTop"><RowHeaderArea :headers="pivot.rowHeaders" :top="scrollTop"></RowHeaderArea></td>
-            <td class="holder cells" v-on:scroll="onScroll"><CellArea :cells="pivot.cells"></CellArea></td>
+            <td style="padding:0">
+                <div style="position: relative;height: 100%;overflow-y: hidden" v-bind:scrollTop="scrollTop"><RowHeaderArea :headers="pivot.rowHeaders" :top="scrollTop"></RowHeaderArea></div>                
+            </td>
+            <td style="padding: 0">
+                <div v-on:scroll="onScroll" style="height:100%;overflow:auto"><CellArea :cells="pivot.cells"></CellArea></div>
+            </td>
         </tr>
     </table>
 
 </template>
 <style scoped>
+
 .holder{
     position: relative;
     padding: 0;
@@ -82,8 +90,6 @@ let onScroll = function (e: any) {
     font-size: 12px;
     border-collapse: collapse;
     table-layout: fixed;
-    width: 100%;
-    height: 100vh;
 }
 
 td,th {

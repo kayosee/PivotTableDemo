@@ -7,6 +7,15 @@ export class DataTable {
         this.columns = columns;
         this.data = [];
     }
+    static fromArray(data: Array<any>, prop: string): DataTable {
+        let table: DataTable = new DataTable(prop);
+        table.add(...data.map(f => f[prop]).filter((value, index, array) => array.indexOf(value) == index).map(f => {
+            let x: any = {};
+            x[prop] = f;
+            return x;
+        }));
+        return table;
+    }
     add(...rows: Array<any>) {
         for (let row of rows) {
             let temp: any = {};
@@ -44,13 +53,13 @@ export class DataTable {
 
         let temp = new DataTable(...columns);
 
-        for (let i = 0; i <= this.data.length; i++) {
-            for (let j = 0; j <= table.data.length; j++) {
+        for (let i = 0; i < this.data.length; i++) {
+            for (let j = 0; j < table.data.length; j++) {
                 let row:any = {};
                 for (let r1 of this.columns) {
                     for (let r2 of table.columns) {
-                        row[r1] = this.data[i]?.[r1]??'';
-                        row[r2] = table.data[j]?.[r2]??'';
+                        row[r1] = this.data[i][r1];
+                        row[r2] = table.data[j][r2];
                     }
                 }
                 temp.add(row);
@@ -70,6 +79,15 @@ export class DataTable {
             }
             temp.add(composite);
         }
+        return temp;
+    }
+    select(...fields: string[]): DataTable {
+        let temp = new DataTable(...fields);
+        this.data.map(f => {
+            let x: any = {};
+            fields.forEach(s => x[s] = f[s])
+            return x;
+        }).forEach(f => temp.data.push(f))
         return temp;
     }
 }

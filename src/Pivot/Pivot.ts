@@ -14,6 +14,10 @@ import { Marshal } from "./Utils/Marshal";
 export class Pivot {
     options: PivotOptions;
 
+
+    rowHeaders2: Array<RowHeader> = [];
+
+
     rowHeaders: Array<RowHeader[]> = [];
     columnHeaders: Array<ColumnHeader[]> = [];
     data: Array<any> = [];
@@ -25,7 +29,7 @@ export class Pivot {
 
         this.data = this.convert(data, this.options.fields);
         let stringFields = this.options.filters.filter(f => this.options.fields.findIndex(s => s.name == f.name && s.type == DataType.String) > 0)
- 
+
         this.cells = this.filter(this.data, stringFields);
         this.cells = this.compute(this.cells);
     }
@@ -44,7 +48,10 @@ export class Pivot {
                             row[field.name] = new Number(data[i][field.name]);
                             break;
                         case DataType.String:
-                            row[field.name] = new String(data[i][field.name])
+                            if (!data[i][field.name])
+                                row[field.name] = new String(this.options.nullValue);
+                            else
+                                row[field.name] = new String(data[i][field.name])
                             break;
                         default:
                             throw new Error(DATA_TYPE_INVALID);
@@ -68,10 +75,15 @@ export class Pivot {
         let copy: Array<any> = Marshal.clone(data);
         let rowTable: DataTable | null = null;
         for (let x of this.options.rows.map(f => f.name)) {
-            if (rowTable == null)
-                rowTable = this.distinct(copy, x);
+            if (rowTable == null) {
+                rowTable = DataTable.fromArray(copy, x);
+                rowTable.data.forEach(f => {
+                    let header = new RowHeader(x, f[x], 0)
+                    this.rowHeaders2.push(header);
+                })
+            }
             else
-                rowTable = rowTable.join(this.distinct(copy, x))
+                rowTable = rowTable.join(DataTable.fromArray(copy, x))
         }
 
         if (rowTable != null) {
@@ -79,18 +91,24 @@ export class Pivot {
                 let headers = new Array<RowHeader>();
                 let i = 0;
                 for (let col of rowTable.columns) {
-                    headers.push(new RowHeader(false, col, row[col], i++, ""));
+                    headers.push(new RowHeader(col, row[col], i++));
                 }
                 this.rowHeaders.push(headers);
             }
+            
+            this.rowHeaders2.forEach(f => {
+                let others: DataTable = Marshal.clone(rowTable);
+                others.data = others.data.filter(s => s[f.field] == f.value);
+                this.buildRowHeader(others.select(...rowTable.columns.filter((_v, i) => i > 0)), f)
+            })            
         }
 
         let colTable: DataTable | null = null;
         for (let x of this.options.columns.map(f => f.name)) {
             if (colTable == null)
-                colTable = this.distinct(copy, x);
+                colTable = DataTable.fromArray(copy, x);
             else
-                colTable = colTable.join(this.distinct(copy, x))
+                colTable = colTable.join(DataTable.fromArray(copy, x))
         }
 
         if (colTable != null) {
@@ -102,7 +120,7 @@ export class Pivot {
                 keys.push(column.name);
                 let headers = new Array<ColumnHeader>();
                 for (let j = 0; j < colTable.columns.length; j++) {
-                    let header = new ColumnHeader(false, column.name, colTable.getByIndex(i, j), j, "")
+                    let header = new ColumnHeader(column.name, colTable.getByIndex(i, j), j)
                     for (let k = i; k >= 0; k--) {
                         header.keys.set(this.options.columns[k].name, colTable.getByIndex(k, j))
                     }
@@ -118,7 +136,7 @@ export class Pivot {
             for (let row of this.rowHeaders) {
                 let valueRow: Array<ValueCell> = [];
                 for (let col of this.columnHeaders[this.columnHeaders.length - 1]) {
-                    
+
                     for (let value of this.options.values) {
                         let valueCell = new ValueCell(value, 0, "0", 0, 0);
                         row.forEach(f => {
@@ -128,21 +146,23 @@ export class Pivot {
                         valueCell.compute(copy);
                         valueRow.push(valueCell);
                     }
-                    
-                    
-                }values.push(valueRow);
+                }
+                values.push(valueRow);
             }
         }
         return values;
     }
 
-    private distinct(data: Array<any>, prop: string): DataTable {
-        let table: DataTable = new DataTable(prop);
-        table.add(...data.map(f => f[prop]).filter((value, index, array) => array.indexOf(value) == index).map(f => {
-            let x: any = {};
-            x[prop] = f;
-            return x;
-        }));
-        return table;
+    private buildRowHeader(table: DataTable, root: RowHeader) {
+        for (let i = 0; i < table.columns.length; i++) {
+            let values = Marshal.distinct(table.data, table.columns[i]);
+
+            for (let value of values) {
+                let child = new RowHeader(table.columns[i], value, 0)
+                root.children.push(child);
+                table.data = table.data.filter(f => f[table.columns[i]] == value);
+                this.buildRowHeader(table.select(...table.columns.filter((_v,i)=>i>0)), child)
+            }
+        }
     }
 }

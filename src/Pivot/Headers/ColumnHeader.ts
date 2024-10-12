@@ -2,8 +2,8 @@ import { Header } from "./Header";
 
 export class ColumnHeader extends Header {
     keys: Map<string, string>;
-    constructor(collapsed: boolean, field: string, value: string | number | Date, index: number, style: string) {
-        super(collapsed, field, value, index, style);
+    constructor(field: string, value: string | number | Date, index: number) {
+        super(field, value, index);
         this.keys = new Map<string, string>();
     }
 }

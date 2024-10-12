@@ -6,14 +6,24 @@ import { RowField } from "./Fields/RowField";
 import { ValueField } from "./Fields/ValueField";
 
 export class PivotOptions {
-    canvas: string;
     fields: Field[] = [];
     columns: ColumnField[] = [];
     rows: RowField[] = [];
     values: ValueField[] = [];
     filters: FilterField[] = [];
+    width: Number = 800;
+    height: Number = 400;
+    nullValue: string = "(空白)";
     constructor(options: any) {
-        this.canvas = options.canvas;
+        if (options.hasOwnProperty("nullValue"))
+            this.nullValue = options["nullValue"];
+
+        if (options.hasOwnProperty("width"))
+            this.width = new Number(options["width"]);
+
+        if (options.hasOwnProperty("height"))
+            this.height = new Number(options["height"]);
+
         for (let i = 0; i < options.fields.length; i++) {
             let field = options.fields[i];
             this.fields.push(

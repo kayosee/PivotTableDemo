@@ -28,3 +28,7 @@
 .frame tr th:last-child {
     border-right: 0;
 }
+
+*{
+    scrollbar-width:thin;
+}

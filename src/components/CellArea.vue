@@ -22,9 +22,6 @@ export default {
 
 <style scoped>
 .frame{
-    top: 0;
-    left:0;
-    position: absolute;
     
 }
 </style>
