@@ -1,11 +1,11 @@
 export class Header {
     collapsed: boolean;
-    field: string;
-    value: string | number | Date;
+    field: string|null;
+    value: string | number | Date|null;
     index: number;
     style: string;
     isTotal: boolean = false;
-    constructor(field: string, value: string | number | Date, index: number) {
+    constructor(field: string|null, value: string | number | Date|null, index: number) {
         this.collapsed = false;
         this.field = field;
         this.value = value;

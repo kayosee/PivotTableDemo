@@ -6,7 +6,7 @@ export class ValueField extends Field {
     aggregator: Aggregator | Function;
     formatter: Function;
     private static aggregators: Map<string, Function> = new Map<string, Function>([
-        ["sum", function (rows: Array<number>) { return rows.length > 0 ? rows.reduce((a, b) => a + b, 0) : null; }],
+        ["sum", function (rows: Array<number>) { return rows.reduce((a, b) => a + b, 0); }],
         ["avg", function (rows: Array<number>) { let sum = rows.reduce((a, b) => a + b, 0); return rows.length > 0 ? sum / rows.length : null; }],
         ["max", function (rows: Array<number | Date>) {
             return rows.length > 0 ?

@@ -6,6 +6,7 @@ import { data } from '../Pivot/data';
 import CellArea from './CellArea.vue'
 import ColumnHeaderArea from './ColumnHeaderArea.vue';
 import RowHeaderArea from './RowHeaderArea.vue';
+import PlainRowArea from './PlainRowArea.vue';
 var options = new PivotOptions({
     canvas: 'cc',
     fields: [
@@ -68,7 +69,8 @@ let onScroll = function (e: any) {
         </tr>
         <tr>
             <td style="padding:0">
-                <div style="position: relative;height: 100%;overflow-y: hidden" v-bind:scrollTop="scrollTop"><RowHeaderArea :headers="pivot.rowHeaders" :top="scrollTop"></RowHeaderArea></div>                
+                <PlainRowArea :headers="pivot.rows"></PlainRowArea>
+                <!-- <div style="position: relative;height: 100%;overflow-y: hidden" v-bind:scrollTop="scrollTop"><RowHeaderArea :headers="pivot.rowHeaders" :top="scrollTop"></RowHeaderArea></div>                 -->
             </td>
             <td style="padding: 0">
                 <div v-on:scroll="onScroll" style="height:100%;overflow:auto"><CellArea :cells="pivot.cells"></CellArea></div>
