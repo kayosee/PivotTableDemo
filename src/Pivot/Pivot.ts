@@ -12,15 +12,19 @@ import { ValueCell } from "./Cells/ValueCell";
 import { Marshal } from "./Utils/Marshal";
 import { Header } from "./Headers/Header";
 import { PlainHeader } from "./Headers/PlainHeader";
+import { Arrays } from "./Utils/Arrays";
 
 export class Pivot {
     options: PivotOptions;
     rowHeaders: Array<RowHeader[]> = [];
     columnHeaders: Array<ColumnHeader[]> = [];
     data: Array<any> = [];
+    view: Array<any> = [];
     cells: Array<Array<ValueCell>> = [];
-    rows: Map<string | null, any> = new Map();
-    columns: Map<string | null, any> = new Map();
+    rowKeys:Array<Array<string>>=[];
+    rowTree: Map<string | null, any> = new Map();
+    columnTree: Map<string | null, any> = new Map();
+    columnKeys:Array<Array<string>>=[];
     constructor(options: PivotOptions) {
         this.options = options;
     }
@@ -29,21 +33,17 @@ export class Pivot {
         this.data = this.convert(data, this.options.fields);
         let stringFields = this.options.filters.filter(f => this.options.fields.findIndex(s => s.name == f.name && s.type == DataType.String) > 0)
 
-        //this.cells = this.filter(this.data, stringFields);
+        this.view = this.filter(this.data, stringFields);
         //this.cells = this.compute(this.cells);
 
-        this.generateHeaders(this.rows, null, null, this.options.rows.map(f => f.name), this.data);
-        this.generateHeaders(this.columns, null, null, this.options.columns.map(f => f.name), this.data);
-        console.log(this.rows);
-        console.log(this.columns);
+        this.generateHeaders(this.rowTree, null, null, this.options.rows.map(f => f.name), this.data);
+        this.generateHeaders(this.columnTree, null, null, this.options.columns.map(f => f.name), this.data);
 
-        let r:Array<Array<string>>=[];
-        let t:Array<Array<any>>=[];
-        let s:Array<string>=[];
-        let v:Array<string>=[];
-        this.gen4(this.rows as Map<string, any>,s,this.options.rows.length,r);
-        this.gen5(this.rows as Map<string, any>,v,t);
-        console.log(v,t);
+        this.gen5(this.rowTree as Map<string, any>, [], this.rowKeys, this.options.rows.length);
+        this.gen5(this.columnTree as Map<string, any>, [], this.columnKeys, this.options.columns.length);
+
+        this.columnKeys = Arrays.rotate(this.columnKeys);
+        console.log(this.columnKeys, this.columnKeys);
     }
     private convert(data: Array<any>, fields: Array<Field>): Array<any> {
         let result: Array<any> = [];
@@ -57,7 +57,7 @@ export class Pivot {
                             row[field.name] = new Date(data[i][field.name]);
                             break;
                         case DataType.Number:
-                            if (Number.isNaN(row[field.name]))
+                            if (isNaN(Number(data[i][field.name])))
                                 row[field.name] = 0;
                             else
                                 row[field.name] = new Number(data[i][field.name]).valueOf();                            
@@ -195,14 +195,13 @@ export class Pivot {
             }
         }
     }
-    private gen5(data: Map<string, any>, temp: Array<string>, result: Array<Array<any>>) {
+    private gen5(data: Map<string, any>, temp: Array<string>, result: Array<Array<any>>, length: number) {
         for (let i of data) {
             if (i[0] == null) {
-                let header = (i[1] as PlainHeader)
-                result.push([...temp, header.values])
+                result.push([...temp, ...new Array(length - temp.length).fill('')])
             }
             if (i[1] instanceof Map) {
-                this.gen5(i[1] as Map<string, any>, [...temp, i[0]], result)
+                this.gen5(i[1] as Map<string, any>, [...temp, i[0]], result, length)
             }
         }
     }

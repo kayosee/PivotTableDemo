@@ -64,13 +64,12 @@ let onScroll = function (e: any) {
         <tr style="height: 30px;">
             <td></td>
             <td style="width:70%" class="holder columns" v-bind:scrollLeft="scrollLeft">
-                <ColumnHeaderArea :headers="pivot.columnHeaders" :left="scrollLeft"></ColumnHeaderArea>
+                <ColumnHeaderArea :headers="pivot.columnKeys" :left="scrollLeft" :valueFields="options.values"></ColumnHeaderArea>
             </td>
         </tr>
         <tr>
             <td style="padding:0">
-                <PlainRowArea :headers="pivot.rows"></PlainRowArea>
-                <!-- <div style="position: relative;height: 100%;overflow-y: hidden" v-bind:scrollTop="scrollTop"><RowHeaderArea :headers="pivot.rowHeaders" :top="scrollTop"></RowHeaderArea></div>                 -->
+                <div style="position: relative;height: 100%;overflow-y: hidden" v-bind:scrollTop="scrollTop"><RowHeaderArea :headers="pivot.rowKeys" :top="scrollTop"></RowHeaderArea></div>                
             </td>
             <td style="padding: 0">
                 <div v-on:scroll="onScroll" style="height:100%;overflow:auto"><CellArea :cells="pivot.cells"></CellArea></div>

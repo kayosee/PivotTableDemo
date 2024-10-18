@@ -6,6 +6,12 @@ export default {
     props: {
         cells: {
             type: Array<Array<ValueCell>>
+        },
+        rows:{
+            type:Array<Array<any>>
+        },
+        columns:{
+
         }
     }
 }

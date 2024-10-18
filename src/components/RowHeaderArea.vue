@@ -5,7 +5,7 @@ export default {
     name: 'RowHeaderArea',
     props: {
         headers: {
-            type: Array<Array<RowHeader>>,
+            type: Array<Array<any>>,
             default: []
         }
     }
@@ -15,7 +15,7 @@ export default {
 <template>
     <table class="frame">
         <tr class="row" v-for="row in headers">
-            <td class="cell" v-for="cell in row">{{ cell.value }}</td>
+            <td class="cell" v-for="cell in row">{{ cell }}</td>
         </tr>
         <tr v-if="headers.length>0">
             <td :colspan="headers[0].length"><span class="placeholder"></span></td>
