@@ -72,7 +72,7 @@ let onScroll = function (e: any) {
                 <div style="position: relative;height: 100%;overflow-y: hidden" v-bind:scrollTop="scrollTop"><RowHeaderArea :headers="pivot.rowKeys" :top="scrollTop"></RowHeaderArea></div>                
             </td>
             <td style="padding: 0">
-                <div v-on:scroll="onScroll" style="height:100%;overflow:auto"><CellArea :cells="pivot.cells"></CellArea></div>
+                <div v-on:scroll="onScroll" style="height:100%;overflow:auto"><CellArea :cells="pivot.cells" :data="pivot.cellTree"></CellArea></div>
             </td>
         </tr>
     </table>

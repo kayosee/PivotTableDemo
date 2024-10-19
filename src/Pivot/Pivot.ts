@@ -21,10 +21,11 @@ export class Pivot {
     data: Array<any> = [];
     view: Array<any> = [];
     cells: Array<Array<ValueCell>> = [];
-    rowKeys:Array<Array<string>>=[];
+    rowKeys: Array<Array<string>> = [];
     rowTree: Map<string | null, any> = new Map();
+    cellTree: Map<string | null, any> = new Map();
     columnTree: Map<string | null, any> = new Map();
-    columnKeys:Array<Array<string>>=[];
+    columnKeys: Array<Array<string>> = [];
     constructor(options: PivotOptions) {
         this.options = options;
     }
@@ -36,14 +37,34 @@ export class Pivot {
         this.view = this.filter(this.data, stringFields);
         //this.cells = this.compute(this.cells);
 
-        this.generateHeaders(this.rowTree, null, null, this.options.rows.map(f => f.name), this.data);
-        this.generateHeaders(this.columnTree, null, null, this.options.columns.map(f => f.name), this.data);
-
+        this.genTree(this.rowTree, null, null, this.options.rows.map(f => f.name), this.data);
+        this.genTree(this.columnTree, null, null, this.options.columns.map(f => f.name), this.data);
+        this.genTree(this.cellTree, null, null, [...this.options.rows.map(f => f.name),...this.options.columns.map(f => f.name)], this.data);
         this.gen5(this.rowTree as Map<string, any>, [], this.rowKeys, this.options.rows.length);
         this.gen5(this.columnTree as Map<string, any>, [], this.columnKeys, this.options.columns.length);
 
+
+        this.genCells();
         this.columnKeys = Arrays.rotate(this.columnKeys);
-        console.log(this.columnKeys, this.columnKeys);
+        console.log(this.columnKeys, this.columnKeys,this.cellTree,this.cells);
+    }
+    private genCells() {
+        for (let row of this.rowKeys) {
+            let one: Array<ValueCell> = [];
+            for (let col of this.columnKeys) {
+                for (let value of this.options.values) {
+                    let cell = new ValueCell(value, 0, '', 0, 0);
+                    this.options.rows.forEach((v, i) => {
+                        cell.rowHeaders.set(v.name, row[i]);                        
+                    });
+                    this.options.columns.forEach((v, i) => {
+                        cell.columnHeaders.set(v.name, col[i]);
+                    });
+                    one.push(cell);
+                }
+            }
+            this.cells.push(one);
+        }
     }
     private convert(data: Array<any>, fields: Array<Field>): Array<any> {
         let result: Array<any> = [];
@@ -60,7 +81,7 @@ export class Pivot {
                             if (isNaN(Number(data[i][field.name])))
                                 row[field.name] = 0;
                             else
-                                row[field.name] = new Number(data[i][field.name]).valueOf();                            
+                                row[field.name] = new Number(data[i][field.name]).valueOf();
                             break;
                         case DataType.String:
                             if (!data[i][field.name])
@@ -158,7 +179,7 @@ export class Pivot {
         return values;
     }
 
-    private generateHeaders(root: Map<string | null, any>, parentField: string | null, parentValue: string | null, fields: Array<string>, array: Array<any>) {
+    private genTree(root: Map<string | null, any>, parentField: string | null, parentValue: string | null, fields: Array<string>, array: Array<any>) {
         let header = new PlainHeader(parentField, parentValue, array)
         for (let value of this.options.values) {
             header.values.set(value.name, value.compute(array))
@@ -198,7 +219,7 @@ export class Pivot {
     private gen5(data: Map<string, any>, temp: Array<string>, result: Array<Array<any>>, length: number) {
         for (let i of data) {
             if (i[0] == null) {
-                result.push([...temp, ...new Array(length - temp.length).fill('')])
+                result.push([...temp, ...new Array(length - temp.length).fill(null)])
             }
             if (i[1] instanceof Map) {
                 this.gen5(i[1] as Map<string, any>, [...temp, i[0]], result, length)

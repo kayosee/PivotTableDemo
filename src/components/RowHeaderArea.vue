@@ -17,9 +17,6 @@ export default {
         <tr class="row" v-for="row in headers">
             <td class="cell" v-for="cell in row">{{ cell }}</td>
         </tr>
-        <tr v-if="headers.length>0">
-            <td :colspan="headers[0].length"><span class="placeholder"></span></td>
-        </tr>
     </table>
 
 </template>
