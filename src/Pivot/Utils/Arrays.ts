@@ -23,13 +23,13 @@ export class Arrays{
             Arrays.group(group[i], fields, group[i].children)
 
     }
-    static rotate(data:Array<Array<any>>){
+    static rotate(data: Array<Array<any>>) {
         let deep = data.length;
-        let width=data[0].length;
+        let width = data[0].length;
         let temp = new Array<Array<any>>;
         for (let i = 0; i < width; i++) {
-            let row:Array<any>=new Array(deep);
-            for (let j = 0; j < deep; j++) {                
+            let row: Array<any> = new Array(deep);
+            for (let j = 0; j < deep; j++) {
                 row[j] = data[j][i];
             }
             temp.push(row);

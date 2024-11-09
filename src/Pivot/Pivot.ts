@@ -13,6 +13,7 @@ import { Marshal } from "./Utils/Marshal";
 import { Header } from "./Headers/Header";
 import { PlainHeader } from "./Headers/PlainHeader";
 import { Arrays } from "./Utils/Arrays";
+import { Sort } from "./Utils/Sort";
 
 export class Pivot {
     options: PivotOptions;
@@ -35,6 +36,7 @@ export class Pivot {
         let stringFields = this.options.filters.filter(f => this.options.fields.findIndex(s => s.name == f.name && s.type == DataType.String) > 0)
 
         this.view = this.filter(this.data, stringFields);
+        
         //this.cells = this.compute(this.cells);
 
         this.genTree(this.rowTree, null, null, this.options.rows.map(f => f.name), this.data);
@@ -43,8 +45,14 @@ export class Pivot {
         this.gen5(this.rowTree as Map<string, any>, [], this.rowKeys, this.options.rows.length);
         this.gen5(this.columnTree as Map<string, any>, [], this.columnKeys, this.options.columns.length);
 
+var sort=new Sort(this.columnKeys);
+        for(let i=0;i<this.options.columns.length;i++)
+            sort.orderBy(i.toString(),false);
 
+        debugger;
+        var x=sort.do();
         this.genCells();
+        
         this.columnKeys = Arrays.rotate(this.columnKeys);
         console.log(this.columnKeys, this.columnKeys,this.cellTree,this.cells);
     }
@@ -200,7 +208,7 @@ export class Pivot {
         for (let key of root.keys()) {
             if (key == null)
                 continue;
-            this.generateHeaders(root.get(key), field, key, fields.filter((_v, _i) => _i > 0), array.filter(f => f[field] == key.toString()))
+            this.genTree(root.get(key), field, key, fields.filter((_v, _i) => _i > 0), array.filter(f => f[field] == key.toString()))
         }
     }
 

@@ -28,12 +28,18 @@ export default {
                     break;
             }
             if (i == path.length) {
-                if (temp instanceof PlainHeader) {
-                    var header = temp as PlainHeader;
+                var header: PlainHeader | null = null;
+                if (temp instanceof PlainHeader)
+                    header = temp as PlainHeader;
+                else if (temp instanceof Map && temp.has(null))
+                    header = temp.get(null) as PlainHeader;
+                if (header != null)
                     return header.values.get(cell.valueField.name);
-                }
             }
             return ''
+        },
+        getPath(cell:ValueCell){
+            return [...cell.rowHeaders.values(), ...cell.columnHeaders.values()].join('.');
         }
     }
 }
@@ -41,7 +47,7 @@ export default {
 <template>
     <table class="frame">
         <tr class="row" v-for="row in cells">
-            <td class="cell" v-for="cell in row">{{ getValue(cell) }}</td>
+            <td class="cell" v-for="cell in row" :data-path="getPath(cell)">{{ getValue(cell) }}</td>
         </tr>
     </table>
 
