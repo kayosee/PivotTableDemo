@@ -7,8 +7,10 @@ import CellArea from './CellArea.vue'
 import ColumnHeaderArea from './ColumnHeaderArea.vue';
 import RowHeaderArea from './RowHeaderArea.vue';
 import PlainRowArea from './PlainRowArea.vue';
+import FieldsPanel from './FieldsPanel.vue';
 var options = new PivotOptions({
     canvas: 'cc',
+    showFieldsPanel:'right',
     fields: [
         { name: 'item_code', title: '代码', type: 'string' },
         { name: 'item_name', title: '名称', type: 'string' },
@@ -65,6 +67,9 @@ let onScroll = function (e: any) {
             <td></td>
             <td style="width:70%" class="holder columns" v-bind:scrollLeft="scrollLeft">
                 <ColumnHeaderArea :headers="pivot.columnKeys" :left="scrollLeft" :valueFields="options.values"></ColumnHeaderArea>
+            </td>
+            <td rowspan="2">
+                <FieldsPanel :options="options"></FieldsPanel>
             </td>
         </tr>
         <tr>

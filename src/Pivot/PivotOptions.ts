@@ -4,6 +4,7 @@ import { FilterField } from "./Fields/FilterField";
 import { FIELD_NOT_EXISTS } from "./locale";
 import { RowField } from "./Fields/RowField";
 import { ValueField } from "./Fields/ValueField";
+import { ShowFieldsPanel } from "./Enums/ShowFieldsPanel";
 
 export class PivotOptions {
     fields: Field[] = [];
@@ -14,6 +15,7 @@ export class PivotOptions {
     width: Number = 800;
     height: Number = 400;
     nullValue: string = "(空白)";
+    showFieldsPanel:ShowFieldsPanel=ShowFieldsPanel.right;
     constructor(options: any) {
         if (options.hasOwnProperty("nullValue"))
             this.nullValue = options["nullValue"];
@@ -24,6 +26,9 @@ export class PivotOptions {
         if (options.hasOwnProperty("height"))
             this.height = new Number(options["height"]);
 
+        if(options.hasOwnProperty('showFieldsPanel'))
+            this.showFieldsPanel=options.showFieldsPanel;
+        
         for (let i = 0; i < options.fields.length; i++) {
             let field = options.fields[i];
             this.fields.push(

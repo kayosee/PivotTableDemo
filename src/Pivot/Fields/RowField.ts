@@ -7,6 +7,9 @@ export class RowField extends Field {
     constructor(name: string, title: string, type: DataType, index: number, style: string, sort: string) {
         super(name, title, type, index, style);
         this.style = style;
-        this.sort = sort as SortOrder;
+        if (sort == 'desc')
+            this.sort = SortOrder.desc;
+        else
+            this.sort = SortOrder.asc;
     }
 }

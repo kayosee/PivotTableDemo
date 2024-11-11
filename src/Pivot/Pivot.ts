@@ -1,7 +1,6 @@
 
 
 import { ColumnHeader } from "./Headers/ColumnHeader";
-import { DataTable } from "./DataTable";
 import { DataType } from "./Enums/DataType";
 import { Field } from "./Fields/Field";
 import { FilterField } from "./Fields/FilterField";
@@ -10,10 +9,10 @@ import { PivotOptions } from "./PivotOptions";
 import { RowHeader } from "./Headers/RowHeader";
 import { ValueCell } from "./Cells/ValueCell";
 import { Marshal } from "./Utils/Marshal";
-import { Header } from "./Headers/Header";
 import { PlainHeader } from "./Headers/PlainHeader";
 import { Arrays } from "./Utils/Arrays";
 import { Sort } from "./Utils/Sort";
+import { SortOrder } from "./Enums/SortOrder";
 
 export class Pivot {
     options: PivotOptions;
@@ -30,31 +29,47 @@ export class Pivot {
     constructor(options: PivotOptions) {
         this.options = options;
     }
+    calc() {
+        let stringFields = this.options.filters.filter(f => this.options.fields.findIndex(s => s.name == f.name && s.type == DataType.String) > 0)
+        this.view = this.filter(this.data, stringFields);
+
+        this.rowTree = new Map();
+        this.genTree(this.rowTree, null, null, this.options.rows.map(f => f.name), this.view);
+
+        this.columnTree = new Map();
+        this.genTree(this.columnTree, null, null, this.options.columns.map(f => f.name), this.view);
+
+        this.cellTree = new Map();
+        this.genTree(this.cellTree, null, null, [...this.options.rows.map(f => f.name), ...this.options.columns.map(f => f.name)], this.view);
+
+        this.rowKeys = [];
+        this.genKey(this.rowTree as Map<string, any>, [], this.rowKeys, this.options.rows.length);
+
+        this.columnKeys = [];
+        this.genKey(this.columnTree as Map<string, any>, [], this.columnKeys, this.options.columns.length);
+
+        this.sort();
+        this.genCells();
+
+        this.columnKeys = Arrays.rotate(this.columnKeys);
+        console.log(this.columnKeys, this.columnKeys, this.cellTree, this.cells);
+    }
     load(data: Array<object>) {
 
         this.data = this.convert(data, this.options.fields);
-        let stringFields = this.options.filters.filter(f => this.options.fields.findIndex(s => s.name == f.name && s.type == DataType.String) > 0)
+        this.calc();
+    }
+    private sort() {
+        var sort = new Sort(this.columnKeys);
+        for (let i = 0; i < this.options.columns.length; i++)
+            sort.orderBy(i.toString(), this.options.columns[i].sort == SortOrder.desc);
+        sort.do();
 
-        this.view = this.filter(this.data, stringFields);
-        
-        //this.cells = this.compute(this.cells);
+        sort = new Sort(this.rowKeys);
+        for (let i = 0; i < this.options.rows.length; i++)
+            sort.orderBy(i.toString(), this.options.rows[i].sort == SortOrder.desc);
+        sort.do();
 
-        this.genTree(this.rowTree, null, null, this.options.rows.map(f => f.name), this.data);
-        this.genTree(this.columnTree, null, null, this.options.columns.map(f => f.name), this.data);
-        this.genTree(this.cellTree, null, null, [...this.options.rows.map(f => f.name),...this.options.columns.map(f => f.name)], this.data);
-        this.gen5(this.rowTree as Map<string, any>, [], this.rowKeys, this.options.rows.length);
-        this.gen5(this.columnTree as Map<string, any>, [], this.columnKeys, this.options.columns.length);
-
-var sort=new Sort(this.columnKeys);
-        for(let i=0;i<this.options.columns.length;i++)
-            sort.orderBy(i.toString(),false);
-
-        debugger;
-        var x=sort.do();
-        this.genCells();
-        
-        this.columnKeys = Arrays.rotate(this.columnKeys);
-        console.log(this.columnKeys, this.columnKeys,this.cellTree,this.cells);
     }
     private genCells() {
         for (let row of this.rowKeys) {
@@ -63,7 +78,7 @@ var sort=new Sort(this.columnKeys);
                 for (let value of this.options.values) {
                     let cell = new ValueCell(value, 0, '', 0, 0);
                     this.options.rows.forEach((v, i) => {
-                        cell.rowHeaders.set(v.name, row[i]);                        
+                        cell.rowHeaders.set(v.name, row[i]);
                     });
                     this.options.columns.forEach((v, i) => {
                         cell.columnHeaders.set(v.name, col[i]);
@@ -114,78 +129,6 @@ var sort=new Sort(this.columnKeys);
         }
         return result;
     }
-    private compute(data: Array<any>): Array<Array<ValueCell>> {
-
-        let copy: Array<any> = Marshal.clone(data);
-        let rowTable: DataTable | null = null;
-        for (let x of this.options.rows.map(f => f.name)) {
-            if (rowTable == null) {
-                rowTable = DataTable.fromArray(copy, x);
-            }
-            else
-                rowTable = rowTable.join(DataTable.fromArray(copy, x))
-        }
-
-        if (rowTable != null) {
-            for (let row of rowTable.data) {
-                let headers = new Array<RowHeader>();
-                let i = 0;
-                for (let col of rowTable.columns) {
-                    headers.push(new RowHeader(col, row[col], i++));
-                }
-                this.rowHeaders.push(headers);
-            }
-        }
-
-        let colTable: DataTable | null = null;
-        for (let x of this.options.columns.map(f => f.name)) {
-            if (colTable == null)
-                colTable = DataTable.fromArray(copy, x);
-            else
-                colTable = colTable.join(DataTable.fromArray(copy, x))
-        }
-
-        if (colTable != null) {
-            colTable = colTable.rotate();
-
-            let i = 0;
-            let keys: Array<string> = [];
-            for (let column of this.options.columns) {
-                keys.push(column.name);
-                let headers = new Array<ColumnHeader>();
-                for (let j = 0; j < colTable.columns.length; j++) {
-                    let header = new ColumnHeader(column.name, colTable.getByIndex(i, j), j)
-                    for (let k = i; k >= 0; k--) {
-                        header.keys.set(this.options.columns[k].name, colTable.getByIndex(k, j))
-                    }
-                    headers.push(header);
-                }
-                i++;
-                this.columnHeaders.push(headers);
-            }
-        }
-
-        let values: Array<ValueCell[]> = [];
-        if (this.options.values.length > 0) {
-            for (let row of this.rowHeaders) {
-                let valueRow: Array<ValueCell> = [];
-                for (let col of this.columnHeaders[this.columnHeaders.length - 1]) {
-
-                    for (let value of this.options.values) {
-                        let valueCell = new ValueCell(value, 0, "0", 0, 0);
-                        row.forEach(f => {
-                            valueCell.rowHeaders.set(f.field, f.value.toString())
-                        });
-                        valueCell.columnHeaders = col.keys;
-                        valueCell.compute(copy);
-                        valueRow.push(valueCell);
-                    }
-                }
-                values.push(valueRow);
-            }
-        }
-        return values;
-    }
 
     private genTree(root: Map<string | null, any>, parentField: string | null, parentValue: string | null, fields: Array<string>, array: Array<any>) {
         let header = new PlainHeader(parentField, parentValue, array)
@@ -212,25 +155,13 @@ var sort=new Sort(this.columnKeys);
         }
     }
 
-    private gen4(data: Map<string, any>, temp: Array<string>, deep: number, result: Array<Array<string | null>>) {
-        if (temp.length >= deep) {
-            result.push(temp);
-            return;
-        }
-
-        for (let i of data) {
-            if (i[1] instanceof Map) {
-                this.gen4(i[1] as Map<string, any>, [...temp, i[0]], deep, result)
-            }
-        }
-    }
-    private gen5(data: Map<string, any>, temp: Array<string>, result: Array<Array<any>>, length: number) {
+    private genKey(data: Map<string, any>, temp: Array<string>, result: Array<Array<any>>, length: number) {
         for (let i of data) {
             if (i[0] == null) {
                 result.push([...temp, ...new Array(length - temp.length).fill(null)])
             }
             if (i[1] instanceof Map) {
-                this.gen5(i[1] as Map<string, any>, [...temp, i[0]], result, length)
+                this.genKey(i[1] as Map<string, any>, [...temp, i[0]], result, length)
             }
         }
     }
