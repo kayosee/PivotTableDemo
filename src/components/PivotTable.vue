@@ -6,7 +6,6 @@ import { data } from '../Pivot/data';
 import CellArea from './CellArea.vue'
 import ColumnHeaderArea from './ColumnHeaderArea.vue';
 import RowHeaderArea from './RowHeaderArea.vue';
-import PlainRowArea from './PlainRowArea.vue';
 import FieldsPanel from './FieldsPanel.vue';
 var options = new PivotOptions({
     canvas: 'cc',
@@ -47,7 +46,7 @@ var options = new PivotOptions({
             field: 'pack', comparison: 'in', critera: ['T0', 'T8']
         }
     ]
-})
+});
 
 var pivot = new Pivot(options);
 pivot.load(data);

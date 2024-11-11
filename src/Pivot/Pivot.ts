@@ -9,13 +9,14 @@ import { PivotOptions } from "./PivotOptions";
 import { RowHeader } from "./Headers/RowHeader";
 import { ValueCell } from "./Cells/ValueCell";
 import { Marshal } from "./Utils/Marshal";
-import { PlainHeader } from "./Headers/PlainHeader";
+import { Summary } from "./Summary";
 import { Arrays } from "./Utils/Arrays";
 import { Sort } from "./Utils/Sort";
 import { SortOrder } from "./Enums/SortOrder";
+import { Ref, ref, watch } from "vue";
 
 export class Pivot {
-    options: PivotOptions;
+    options: Ref<PivotOptions>;
     rowHeaders: Array<RowHeader[]> = [];
     columnHeaders: Array<ColumnHeader[]> = [];
     data: Array<any> = [];
@@ -27,26 +28,31 @@ export class Pivot {
     columnTree: Map<string | null, any> = new Map();
     columnKeys: Array<Array<string>> = [];
     constructor(options: PivotOptions) {
-        this.options = options;
+        this.options = ref(options);
+        watch(this.options,(a,b)=>{
+            this.calc();
+        },
+        { deep: true })
     }
     calc() {
-        let stringFields = this.options.filters.filter(f => this.options.fields.findIndex(s => s.name == f.name && s.type == DataType.String) > 0)
+        let options = this.options.value;
+        let stringFields = options.filters.filter(f => options.fields.findIndex(s => s.name == f.name && s.type == DataType.String) > 0)
         this.view = this.filter(this.data, stringFields);
 
         this.rowTree = new Map();
-        this.genTree(this.rowTree, null, null, this.options.rows.map(f => f.name), this.view);
+        this.genTree(this.rowTree, null, null, options.rows.map(f => f.name), this.view);
 
         this.columnTree = new Map();
-        this.genTree(this.columnTree, null, null, this.options.columns.map(f => f.name), this.view);
+        this.genTree(this.columnTree, null, null, options.columns.map(f => f.name), this.view);
 
         this.cellTree = new Map();
-        this.genTree(this.cellTree, null, null, [...this.options.rows.map(f => f.name), ...this.options.columns.map(f => f.name)], this.view);
+        this.genTree(this.cellTree, null, null, [...options.rows.map(f => f.name), ...options.columns.map(f => f.name)], this.view);
 
         this.rowKeys = [];
-        this.genKey(this.rowTree as Map<string, any>, [], this.rowKeys, this.options.rows.length);
+        this.genKey(this.rowTree as Map<string, any>, [], this.rowKeys, options.rows.length);
 
         this.columnKeys = [];
-        this.genKey(this.columnTree as Map<string, any>, [], this.columnKeys, this.options.columns.length);
+        this.genKey(this.columnTree as Map<string, any>, [], this.columnKeys, options.columns.length);
 
         this.sort();
         this.genCells();
@@ -56,31 +62,32 @@ export class Pivot {
     }
     load(data: Array<object>) {
 
-        this.data = this.convert(data, this.options.fields);
+        this.data = this.convert(data, this.options.value.fields);
         this.calc();
     }
     private sort() {
         var sort = new Sort(this.columnKeys);
-        for (let i = 0; i < this.options.columns.length; i++)
-            sort.orderBy(i.toString(), this.options.columns[i].sort == SortOrder.desc);
+        for (let i = 0; i < this.options.value.columns.length; i++)
+            sort.orderBy(i.toString(), this.options.value.columns[i].sort == SortOrder.desc);
         sort.do();
 
         sort = new Sort(this.rowKeys);
-        for (let i = 0; i < this.options.rows.length; i++)
-            sort.orderBy(i.toString(), this.options.rows[i].sort == SortOrder.desc);
+        for (let i = 0; i < this.options.value.rows.length; i++)
+            sort.orderBy(i.toString(), this.options.value.rows[i].sort == SortOrder.desc);
         sort.do();
 
     }
     private genCells() {
+        let options = this.options.value;
         for (let row of this.rowKeys) {
             let one: Array<ValueCell> = [];
             for (let col of this.columnKeys) {
-                for (let value of this.options.values) {
+                for (let value of options.values) {
                     let cell = new ValueCell(value, 0, '', 0, 0);
-                    this.options.rows.forEach((v, i) => {
+                    options.rows.forEach((v, i) => {
                         cell.rowHeaders.set(v.name, row[i]);
                     });
-                    this.options.columns.forEach((v, i) => {
+                    options.columns.forEach((v, i) => {
                         cell.columnHeaders.set(v.name, col[i]);
                     });
                     one.push(cell);
@@ -108,7 +115,7 @@ export class Pivot {
                             break;
                         case DataType.String:
                             if (!data[i][field.name])
-                                row[field.name] = this.options.nullValue;
+                                row[field.name] = this.options.value.nullValue;
                             else
                                 row[field.name] = data[i][field.name];
                             break;
@@ -131,8 +138,8 @@ export class Pivot {
     }
 
     private genTree(root: Map<string | null, any>, parentField: string | null, parentValue: string | null, fields: Array<string>, array: Array<any>) {
-        let header = new PlainHeader(parentField, parentValue, array)
-        for (let value of this.options.values) {
+        let header = new Summary(parentField, parentValue, array)
+        for (let value of this.options.value.values) {
             header.values.set(value.name, value.compute(array))
         }
         root.set(null, header);

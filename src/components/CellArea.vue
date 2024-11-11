@@ -1,7 +1,7 @@
 <script lang="ts">
 import { ValueCell } from '../Pivot/Cells/ValueCell';
 import { ValueField } from '../Pivot/Fields/ValueField';
-import { PlainHeader } from '../Pivot/Headers/PlainHeader';
+import { Summary } from '../Pivot/Summary';
 
 export default {
     name: 'CellArea',
@@ -28,11 +28,11 @@ export default {
                     break;
             }
             if (i == path.length) {
-                var header: PlainHeader | null = null;
-                if (temp instanceof PlainHeader)
-                    header = temp as PlainHeader;
+                var header: Summary | null = null;
+                if (temp instanceof Summary)
+                    header = temp as Summary;
                 else if (temp instanceof Map && temp.has(null))
-                    header = temp.get(null) as PlainHeader;
+                    header = temp.get(null) as Summary;
                 if (header != null)
                     return header.values.get(cell.valueField.name);
             }

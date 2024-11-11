@@ -1,6 +1,4 @@
 import { ValueField } from "../Fields/ValueField";
-import { ColumnHeader } from "../Headers/ColumnHeader";
-import { RowHeader } from "../Headers/RowHeader";
 import { Marshal } from "../Utils/Marshal";
 
 export class ValueCell {

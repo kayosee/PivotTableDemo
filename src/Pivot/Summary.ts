@@ -1,4 +1,4 @@
-export class PlainHeader {
+export class Summary {
     fieldName: string|null;
     fieldValue: string | null;
     data: Array<any>;
