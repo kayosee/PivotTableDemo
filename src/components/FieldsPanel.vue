@@ -23,33 +23,34 @@ export default {
             e.preventDefault();
             var from: Area = e.dataTransfer.getData('from');
             var field: string = e.dataTransfer.getData('field');
-            switch (area) {
-                case Area.field:
-                    {
-                        let array: Array<Field> | null = null;
-                        switch (from) {
-                            case Area.column:
-                                array = this.options.columns;
-                                break;
-                            case Area.filter:
-                                array = this.options.filters;
-                                break;
-                            case Area.row:
-                                array = this.options.rows;
-                                break;
-                            case Area.value:
-                                array = this.options.values;
-                                break;
-                            default:
-                                console.error();
-                        }
-                        if (array != null) {
-                            let index = array.findIndex(f => f.name == field);
-                            if (index > -1)
-                                array.splice(index, 1);
-                        }
-                    }
+            this.moveField(from, area as Area, this.getIndex(e), field);
+            this.$forceUpdate();
+        },
+        getIndex: function (e: any): number {
+            if (e.target.nodeName == 'TD') {
+                if (e.y < e.target.height / 2)
+                    return 0;
+                else
+                    return e.target.attributes['field-count'].value;
             }
+            var target: any = e.target;
+            if (e.target.nodeName == 'LABEL') {
+                target = e.target.parentElement;
+            }
+            var index: number = parseInt(target.attributes['field-index'].value)
+            if (e.y < target.height / 2)
+                return index;
+            else
+                return index + 1;
+        },
+        moveField: function (from: Area, to: Area, index: number, fieldName: string) {
+            if (to == Area.column || to == Area.row || to == Area.field) {
+                var field: Field | undefined = this.options.fields.find(f => f.name == fieldName);
+                if (field != undefined)
+                    this.options.moveField(from, to, index, field);
+            }
+          
+            console.log(index);
         }
     }
 }
@@ -61,8 +62,10 @@ export default {
             <td colspan="2" class="label">所有列</td>
         </tr>
         <tr class="row">
-            <td colspan="2" v-on:drop="(e) => drop(e, 'field')" v-on:dragover="allowDrop">
-                <div v-for="field in options.fields" draggable="true" v-on:dragstart="(e) => drag(e, 'field', field)">
+            <td colspan="2" v-on:drop="(e) => drop(e, 'field')" v-on:dragover="allowDrop"
+                :field-count="options.fields.length">
+                <div class="field" v-for="(field, index) in options.fields" draggable="true"
+                    v-on:dragstart="(e) => drag(e, 'field', field)" :field-index="index">
                     <label>{{ field.title }}</label>
                 </div>
             </td>
@@ -72,13 +75,15 @@ export default {
             <td class="label">行列</td>
         </tr>
         <tr class="row">
-            <td v-on:drop="(e) => drop(e, 'filter')" v-on:dragover="allowDrop">
-                <div v-for="field in options.filters" draggable="true" v-on:dragstart="(e) => drag(e, 'filter', field)">
+            <td v-on:drop="(e) => drop(e, 'filter')" v-on:dragover="allowDrop" :field-count="options.filters.length">
+                <div class="field" v-for="(field, index) in options.filters" draggable="true"
+                    v-on:dragstart="(e) => drag(e, 'filter', field)" :field-index="index">
                     <label>{{ field.title }}</label>
                 </div>
             </td>
-            <td v-on:drop="(e) => drop(e, 'row')" v-on:dragover="allowDrop">
-                <div v-for="field in options.rows" draggable="true" v-on:dragstart="(e) => drag(e, 'row', field)">
+            <td v-on:drop="(e) => drop(e, 'row')" v-on:dragover="allowDrop" :field-count="options.rows.length">
+                <div class="field" v-for="(field, index) in options.rows" draggable="true"
+                    v-on:dragstart="(e) => drag(e, 'row', field)" :field-index="index">
                     <label>{{ field.title }}</label>
                 </div>
             </td>
@@ -88,13 +93,15 @@ export default {
             <td class="label">数值</td>
         </tr>
         <tr class="row">
-            <td v-on:drop="(e) => drop(e, 'column')" v-on:dragover="allowDrop">
-                <div v-for="field in options.filters" draggable="true" v-on:dragstart="(e) => drag(e, 'column', field)">
+            <td v-on:drop="(e) => drop(e, 'column')" v-on:dragover="allowDrop" :field-count="options.columns.length">
+                <div class="field" v-for="(field, index) in options.columns" draggable="true"
+                    v-on:dragstart="(e) => drag(e, 'column', field)" :field-index="index">
                     <label>{{ field.title }}</label>
                 </div>
             </td>
-            <td v-on:drop="(e) => drop(e, 'value')" v-on:dragover="allowDrop">
-                <div v-for="field in options.values" draggable="true" v-on:dragstart="(e) => drag(e, 'value', field)">
+            <td v-on:drop="(e) => drop(e, 'value')" v-on:dragover="allowDrop" :field-count="options.values.length">
+                <div class="field" v-for="(field, index) in options.values" draggable="true"
+                    v-on:dragstart="(e) => drag(e, 'value', field)" :field-index="index">
                     <label>{{ field.title }}</label>
                 </div>
             </td>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { Pivot } from '../Pivot/Pivot.ts';
 import { PivotOptions } from '../Pivot/PivotOptions';
 import { data } from '../Pivot/data';
@@ -22,8 +22,8 @@ var options = new PivotOptions({
         { name: 'route', title: '工艺路线', type: 'string' }
     ],
     columns: [
-        { field: 'pack', style: {} },
-        { field: 'stall', style: {} },
+        // { field: 'pack', style: {} },
+        // { field: 'stall', style: {} },
     ],
     rows: [
         { field: 'route', style: {} },    
@@ -48,7 +48,7 @@ var options = new PivotOptions({
     ]
 });
 
-var pivot = new Pivot(options);
+var pivot = reactive (new Pivot(options));
 pivot.load(data);
 
 let scrollTop = ref(0);

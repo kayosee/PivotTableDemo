@@ -2,8 +2,8 @@ import { ValueField } from "../Fields/ValueField";
 import { Marshal } from "../Utils/Marshal";
 
 export class ValueCell {
-    rowHeaders: Map<string, string>;
-    columnHeaders: Map<string, string>;
+    rowHeaders: Map<string, string|null>;
+    columnHeaders: Map<string, string|null>;
     valueField: ValueField;
     value: number;
     text: string;
