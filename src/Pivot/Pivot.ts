@@ -13,7 +13,6 @@ import { Summary } from "./Summary";
 import { Arrays } from "./Utils/Arrays";
 import { Sort } from "./Utils/Sort";
 import { SortOrder } from "./Enums/SortOrder";
-import { Ref, ref, watch } from "vue";
 
 
 export class Pivot {
@@ -29,11 +28,7 @@ export class Pivot {
     columnTree: Map<string | null, any> = new Map();
     columnKeys: Array<Array<string|null>> = [];
     constructor(options: PivotOptions) {
-        let me = this;
         this.options = options;
-        this.options.onPropertyChanged = function () {
-            me.calc();
-        }
     }
     calc() {
         let options = this.options;
@@ -66,7 +61,7 @@ export class Pivot {
         this.genCells();
 
         this.columnKeys = Arrays.rotate(this.columnKeys);
-        console.log(this.columnKeys, this.columnKeys, this.cellTree, this.cells);
+        //console.log(this.columnKeys, this.columnKeys, this.cellTree, this.cells);
     }
     load(data: Array<object>) {
 

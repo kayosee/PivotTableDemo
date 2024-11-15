@@ -62,7 +62,7 @@ export class PivotOptions {
             if (field == null) {
                 throw FIELD_NOT_EXISTS;
             }
-            this.values.push(new ValueField(field.name, field.title, field.type, i, value.style, value.aggregator, value.formatter));
+            this.values.push(new ValueField(field.name, field.title, field.type, i, value.style, value.aggregator,value.format, value.formatter, value.sort));
         }
 
         for (let i = 0; i < options.filters.length; i++) {

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { getCurrentInstance, reactive, ref } from 'vue';
 import { Pivot } from '../Pivot/Pivot.ts';
 import { PivotOptions } from '../Pivot/PivotOptions';
 import { data } from '../Pivot/data';
@@ -31,7 +31,7 @@ var options = new PivotOptions({
     ],
     values: [
         {
-            field: 'complete_qty', aggregator: 'sum', style: {}, formatter: function (value: number) {
+            field: 'complete_qty', aggregator: 'sum', style: {},format:'decimal', formatter: function (value: number) {
                 if (value > 0)
                     return 'color:red';
                 return 'color:black';
@@ -50,7 +50,11 @@ var options = new PivotOptions({
 
 var pivot = reactive (new Pivot(options));
 pivot.load(data);
-
+pivot.options.onPropertyChanged=function(){
+    pivot.calc();
+    const instance = getCurrentInstance();
+    instance?.proxy?.$forceUpdate();
+}
 let scrollTop = ref(0);
 let scrollLeft = ref(0);
 let onScroll = function (e: any) {

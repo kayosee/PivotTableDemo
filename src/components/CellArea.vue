@@ -1,30 +1,31 @@
 <script lang="ts">
 import { ValueCell } from '../Pivot/Cells/ValueCell';
+import { ValueFormat } from '../Pivot/Enums/ValueFormat';
 import { ValueField } from '../Pivot/Fields/ValueField';
 import { Summary } from '../Pivot/Summary';
 
 export default {
     name: 'CellArea',
     props: {
-        cells:{
-            type:Array<Array<ValueCell>>,
-                default:[]
+        cells: {
+            type: Array<Array<ValueCell>>,
+            default: []
         },
-        data:{
-            type:Map<string|null,any>,
-            default:{}
+        data: {
+            type: Map<string | null, any>,
+            default: {}
         }
     },
     methods: {
         getValue(cell: ValueCell) {
-            
+
             let path = [...cell.rowHeaders.values(), ...cell.columnHeaders.values()];
             let temp: any = this.data;
             let i = 0;
             for (; i < path.length; i++) {
                 if (temp instanceof Map && temp.has(path[i]))
                     temp = temp.get(path[i])
-                else 
+                else
                     break;
             }
             if (i == path.length) {
@@ -33,12 +34,34 @@ export default {
                     header = temp as Summary;
                 else if (temp instanceof Map && temp.has(null))
                     header = temp.get(null) as Summary;
-                if (header != null)
-                    return header.values.get(cell.valueField.name);
+                if (header != null) {
+                    var value = header.values.get(cell.valueField.name);
+                    if (value == null)
+                        return '';
+                    
+                    debugger;
+                    switch (cell.valueField.format) {
+                        case ValueFormat.integer:
+                            return value?.toFixed(0);
+                        case ValueFormat.money:
+                            return value?.toFixed(2);
+                        case ValueFormat.percentage:
+                            return ((value * 100).toFixed(4)).toString() + '%';
+                        case ValueFormat.date:
+                        case ValueFormat.datetime:
+                        case ValueFormat.time:
+                        case ValueFormat.decimal:
+                            return value;
+                        case ValueFormat.custom:
+                            return cell.valueField.formatter(value);
+                        default:
+                            return value;
+                    }
+                }
             }
             return ''
         },
-        getPath(cell:ValueCell){
+        getPath(cell: ValueCell) {
             return [...cell.rowHeaders.values(), ...cell.columnHeaders.values()].join('.');
         }
     }

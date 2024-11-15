@@ -1,9 +1,13 @@
 import { Field } from "./Field";
 import { DataType } from "../Enums/DataType";
 import { Aggregator } from "../Enums/Aggregator";
+import { ISortable } from "./ISortable";
+import { SortOrder } from "../Enums/SortOrder";
+import { ValueFormat } from "../Enums/ValueFormat";
 
-export class ValueField extends Field {
+export class ValueField extends Field implements ISortable {
     aggregator: Aggregator | Function;
+    format: ValueFormat;
     formatter: Function;
     private static aggregators: Map<string, Function> = new Map<string, Function>([
         ["sum", function (rows: Array<number>) { return rows.reduce((a, b) => a + b, 0); }],
@@ -38,13 +42,25 @@ export class ValueField extends Field {
             return (ValueField.aggregators.get(method))?.(rows.map(f => f[this.name]));
         }
     }
-    constructor(name: string, title: string, type: DataType, index: number, style: string, aggregator: string | Function, formatter: Function) {
+    constructor(name: string, title: string, type: DataType, index: number, style: string, aggregator: string | Function, format: string, formatter: Function, sort: string) {
         super(name, title, type, index, style);
         if (typeof (aggregator) == 'string')
             this.aggregator = aggregator as Aggregator;
         else
-            this.aggregator = aggregator;
+            this.aggregator = aggregator ?? Aggregator.sum;
         this.style = style;
+        if (typeof (format) == 'string')
+            this.format = format as ValueFormat;
+        else
+            this.format = format ?? ValueFormat.auto;
         this.formatter = formatter;
+
+        if (sort == 'desc')
+            this.sort = SortOrder.desc;
+        else if (sort == 'asc')
+            this.sort = SortOrder.asc;
+        else
+            this.sort = SortOrder.none;
     }
+    sort: SortOrder;
 }
