@@ -41,12 +41,10 @@ export default {
     <table class="frame">
         <tr class="row" v-for="row in headers">
             <td :colspan="valueFields.length" class="cell" v-for="cell in row">{{ cell }}</td>
-
             <td><span class="placeholder"></span></td>
         </tr>
         <tr class="row">
             <td class="cell" v-for="cell in getAggregators()">{{ cell.title }}</td>
-
             <td><span class="placeholder"></span></td>
         </tr>
     </table>

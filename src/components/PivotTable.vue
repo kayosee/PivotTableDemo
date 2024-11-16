@@ -9,7 +9,7 @@ import RowHeaderArea from './RowHeaderArea.vue';
 import FieldsPanel from './FieldsPanel.vue';
 var options = new PivotOptions({
     canvas: 'cc',
-    showFieldsPanel:'right',
+    showFieldsPanel: 'right',
     fields: [
         { name: 'item_code', title: '代码', type: 'string' },
         { name: 'item_name', title: '名称', type: 'string' },
@@ -19,23 +19,25 @@ var options = new PivotOptions({
         { name: 'pack', title: '包装', type: 'string' },
         { name: 'status', title: '状态', type: 'string' },
         { name: 'end_worker', title: '工人', type: 'string' },
-        { name: 'route', title: '工艺路线', type: 'string' }
+        { name: 'route', title: '工艺路线', type: 'string' },
+        { name: 'start_time', title: '开工时间', type: 'date', format: 'date' },
+        { name: 'end_time', title: '报工时间', type: 'date', format: 'date' },
     ],
     columns: [
         // { field: 'pack', style: {} },
         // { field: 'stall', style: {} },
     ],
     rows: [
-        { field: 'route', style: {} },    
-        { field: 'end_worker', style: {} },        
+        { field: 'route', style: {} },
+        { field: 'end_worker', style: {} },
     ],
     values: [
         {
-            field: 'complete_qty', aggregator: 'sum', style: {},format:'decimal', formatter: function (value: number) {
-                if (value > 0)
-                    return 'color:red';
+            field: 'complete_qty', aggregator: 'sum', style: function (value: number) {
+                if (value > 5000)
+                    return 'color:red;font-weight:bold';
                 return 'color:black';
-            }
+            }, format: 'decimal'
         }
     ],
     filters: [
@@ -48,9 +50,9 @@ var options = new PivotOptions({
     ]
 });
 
-var pivot = reactive (new Pivot(options));
+var pivot = reactive(new Pivot(options));
 pivot.load(data);
-pivot.options.onPropertyChanged=function(){
+pivot.options.onPropertyChanged = function () {
     pivot.calc();
     const instance = getCurrentInstance();
     instance?.proxy?.$forceUpdate();
@@ -69,7 +71,8 @@ let onScroll = function (e: any) {
         <tr style="height: 30px;">
             <td></td>
             <td style="width:70%" class="holder columns" v-bind:scrollLeft="scrollLeft">
-                <ColumnHeaderArea :headers="pivot.columnKeys" :left="scrollLeft" :valueFields="options.values"></ColumnHeaderArea>
+                <ColumnHeaderArea :headers="pivot.columnKeys" :left="scrollLeft" :valueFields="options.values">
+                </ColumnHeaderArea>
             </td>
             <td rowspan="2">
                 <FieldsPanel :options="options"></FieldsPanel>
@@ -77,31 +80,38 @@ let onScroll = function (e: any) {
         </tr>
         <tr>
             <td style="padding:0">
-                <div style="position: relative;height: 100%;overflow-y: hidden" v-bind:scrollTop="scrollTop"><RowHeaderArea :headers="pivot.rowKeys" :top="scrollTop"></RowHeaderArea></div>                
+                <div style="position: relative;height: 100%;overflow-y: hidden" v-bind:scrollTop="scrollTop">
+                    <RowHeaderArea :headers="pivot.rowKeys" :top="scrollTop"></RowHeaderArea>
+                </div>
             </td>
             <td style="padding: 0">
-                <div v-on:scroll="onScroll" style="height:100%;overflow:auto"><CellArea :cells="pivot.cells" :data="pivot.cellTree"></CellArea></div>
+                <div v-on:scroll="onScroll" style="height:100%;overflow:auto">
+                    <CellArea :cells="pivot.cells" :data="pivot.cellTree"></CellArea>
+                </div>
             </td>
         </tr>
     </table>
 
 </template>
 <style scoped>
-
-.holder{
+.holder {
     position: relative;
     padding: 0;
 }
-.columns,.rows{
+
+.columns,
+.rows {
     overflow: hidden;
 }
+
 .pivot {
     font-size: 12px;
     border-collapse: collapse;
     table-layout: fixed;
 }
 
-td,th {
+td,
+th {
     border: 1px solid black;
     overflow: auto
 }

@@ -10,12 +10,12 @@ export default {
     name: 'FieldsPanel',
     data: function () {
         var rowColumnField: RowField | ColumnField | null = null;
-        var valueField:ValueField|null=null;
+        var valueField: ValueField | null = null;
         return {
             showRowColumnFieldOptions: false,
-            showValueFieldOptions:false,
+            showValueFieldOptions: false,
             rowColumnField: rowColumnField,
-            valueField:valueField
+            valueField: valueField
         }
     },
     props: {
@@ -71,13 +71,13 @@ export default {
                     this.showRowColumnFieldOptions = true;
                     break;
                 case Area.value:
-                    this.valueField=field;
-                    this.showValueFieldOptions=true;
+                    this.valueField = field;
+                    this.showValueFieldOptions = true;
                     break;
             }
         },
         saveFieldOptions: function () {
-            this.showValueFieldOptions=false;
+            this.showValueFieldOptions = false;
             this.showRowColumnFieldOptions = false;
             if (this.options != null)
                 this.options.onPropertyChanged();

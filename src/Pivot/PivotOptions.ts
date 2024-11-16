@@ -34,7 +34,7 @@ export class PivotOptions {
         for (let i = 0; i < options.fields.length; i++) {
             let field = options.fields[i];
             this.fields.push(
-                new Field(field.name, field.title, field.type, i, field.style)
+                new Field(field.name, field.title, field.type, i, field.style, field.format, field.formatter)
             );
         }
 
@@ -44,7 +44,7 @@ export class PivotOptions {
             if (field == null) {
                 throw FIELD_NOT_EXISTS;
             }
-            this.columns.push(new ColumnField(field.name, field.title, field.type, i, column.style, column.sort));
+            this.columns.push(new ColumnField(field.name, field.title, field.type, i, column.style, column.format, column.formatter, column.sort));
         }
 
         for (let i = 0; i < options.rows.length; i++) {
@@ -53,7 +53,7 @@ export class PivotOptions {
             if (field == null) {
                 throw FIELD_NOT_EXISTS;
             }
-            this.rows.push(new RowField(field.name, field.title, field.type, i, row.style, row.sort));
+            this.rows.push(new RowField(field.name, field.title, field.type, i, row.style, row.sort, row.format, row.formatter));
         }
 
         for (let i = 0; i < options.values.length; i++) {
@@ -62,7 +62,7 @@ export class PivotOptions {
             if (field == null) {
                 throw FIELD_NOT_EXISTS;
             }
-            this.values.push(new ValueField(field.name, field.title, field.type, i, value.style, value.aggregator,value.format, value.formatter, value.sort));
+            this.values.push(new ValueField(field.name, field.title, field.type, i, value.style, value.aggregator, value.format, value.formatter, value.sort));
         }
 
         for (let i = 0; i < options.filters.length; i++) {
@@ -124,6 +124,9 @@ export class PivotOptions {
         }
 
         if (fromArray && toArray) {
+            if (toArray.find(f => f.name == field.name))
+                return false;
+
             toArray.splice(toIndex, 0, field);
             fromArray.splice(fromIndex, 1);
             if (this.onPropertyChanged != null)
@@ -187,7 +190,7 @@ export class PivotOptions {
         if (toArray != null) {
             if (pos < 0)
                 toArray.splice(0, 0, field)
-            else if(pos>toArray.length)
+            else if (pos > toArray.length)
                 toArray.push(field);
             else
                 toArray.splice(pos, 0, field)

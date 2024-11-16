@@ -2,11 +2,12 @@ import { ValueField } from "../Fields/ValueField";
 import { Marshal } from "../Utils/Marshal";
 
 export class ValueCell {
-    rowHeaders: Map<string, string|null>;
-    columnHeaders: Map<string, string|null>;
+    rowHeaders: Map<string, string | null>;
+    columnHeaders: Map<string, string | null>;
     valueField: ValueField;
-    value: number;
+    value: number | null;
     text: string;
+    style: string | null = null;
     x: number;
     y: number;
     data: Array<any> = [];

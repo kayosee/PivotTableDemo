@@ -22,8 +22,8 @@ export class FilterField extends Field {
         ["between", function (a: number | Date, b: number | Date, c: number | Date) { return a >= b && a <= c; }],
         ["in", function (a: any, b: Array<any>) { return b.findIndex(f => f == a) > -1; }]
     ])
-    constructor(name: string, title: string, type: DataType, index: number, style: string, comparison: string | Function, critera: string | number | Date) {
-        super(name, title, type, index, style);
+    constructor(name: string, title: string, type: DataType, index: number, style: string | Function | null, comparison: string | Function, critera: string | number | Date) {
+        super(name, title, type, index, style, null, null);
         this.critera = critera;
         if (typeof (comparison) == 'string')
             this.comparison = comparison as Comparison;

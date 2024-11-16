@@ -38,9 +38,9 @@ export class Sort {
                     else //当字符串
                     {
                         if (!i.isDescend)
-                            result = (a[i.field].toString().localeCompare(b[i.field].toString()));
+                            result = (a[i.field].toString().localeCompare(b[i.field].toString(), 'zh-Hans-CN', { sensitivity: 'accent' }));
                         else
-                            result = (b[i.field].toString().localeCompare(a[i.field].toString()));
+                            result = (b[i.field].toString().localeCompare(a[i.field].toString(), 'zh-Hans-CN', { sensitivity: 'accent' }));
                     }
                 }
 

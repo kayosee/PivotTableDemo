@@ -5,14 +5,14 @@ import { ISortable } from "./ISortable";
 
 export class RowField extends Field implements ISortable {
     sort: SortOrder;
-    constructor(name: string, title: string, type: DataType, index: number, style: string, sort: string) {
-        super(name, title, type, index, style);
+    constructor(name: string, title: string, type: DataType, index: number, style: string, format: string, formatter: Function, sort: string) {
+        super(name, title, type, index, style, format, formatter);
         this.style = style;
         if (sort == 'desc')
             this.sort = SortOrder.desc;
-        else if(sort=='asc')
+        else if (sort == 'asc')
             this.sort = SortOrder.asc;
         else
-            this.sort=SortOrder.none;
+            this.sort = SortOrder.none;
     }
 }
