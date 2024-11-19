@@ -7,5 +7,6 @@ import 'vue-enums'
 
 var app=createApp(App);
 app.use(ElementPlus);
-app.component('PlainRowItem')
+//app.component('PlainRowItem');
+//app.component('FilterDialog');
 app.mount('#app')

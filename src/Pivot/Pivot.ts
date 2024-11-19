@@ -125,7 +125,6 @@ export class Pivot {
                             cell.style = value.getStyle(cell.value);
                         }
                     }
-
                     one.push(cell);
                 }
             }

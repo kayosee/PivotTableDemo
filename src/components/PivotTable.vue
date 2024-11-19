@@ -45,7 +45,7 @@ var options = new PivotOptions({
             field: 'status', comparison: 'equals', critera: '已完工'
         },
         {
-            field: 'pack', comparison: 'in', critera: ['T0', 'T8']
+            field: 'pack', comparison: 'contains', critera: ['T0', 'T8']
         }
     ]
 });
