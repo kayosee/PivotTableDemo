@@ -13,18 +13,18 @@ export default {
 </script>
 
 <template>
-    <table class="frame">
+    <table class="pivot-frame">
         <tr class="row" v-for="row in headers">
-            <td class="cell" v-for="cell in row">{{ cell }}</td>
+            <td class="pivot-cell" v-for="cell in row">{{ cell }}</td>
         </tr>
     </table>
 
 </template>
 <style scoped>
-.cell{
+.pivot-cell{
     white-space: nowrap;
 }
-.frame {
+.pivot-frame {
     position: absolute;
     left: 0;
     top: 0;

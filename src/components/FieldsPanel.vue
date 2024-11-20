@@ -71,26 +71,40 @@ export default {
                 case Area.column:
                 case Area.row:
                     this.$refs.rowColumnDialog.open(field, function (result: RowField | ColumnField) {
+                        let which = field as RowField | ColumnField;
+                        which.sort = result.sort;
+                        which.format = result.format;
+                        which.formatter = result.formatter;
+                        which.style = result.style;
                         me.options.onPropertyChanged();
                     });
                     break;
                 case Area.value:
                     this.$refs.valueDialog.open(field, function (result: ValueField) {
+                        let which = field as ValueField;
+                        which.aggregator = result.aggregator;
+                        which.sort = result.sort;
+                        which.format = result.format;
+                        which.formatter = result.formatter;
+                        which.style = result.style;
                         me.options.onPropertyChanged();
                     });
                     break;
                 case Area.filter:
                     this.$refs.filterDialog.open(field, function (result: FilterField) {
+                        let which = field as FilterField;
+                        which.comparison = result.comparison;
+                        which.critera = result.critera;
+                        which.start = result.start;
+                        which.end = result.end;
+                        which.list = result.list;
+                        which.format = result.format;
+                        which.formatter = result.formatter;
+                        which.style = result.style;
                         me.options.onPropertyChanged();
                     });
                     break;
             }
-        },
-        saveFieldOptions: function () {
-            this.showValueOptions = false;
-            this.showRowColumnOptions = false;
-            if (this.options != null)
-                this.options.onPropertyChanged();
         }
     }
 }
@@ -100,7 +114,7 @@ export default {
     <FilterDialog ref="filterDialog"></FilterDialog>
     <RowColumnDialog ref="rowColumnDialog"></RowColumnDialog>
     <ValueDialog ref="valueDialog"></ValueDialog>
-    <table class="frame">
+    <table class="pivot-frame">
         <tr class="row">
             <td colspan="2" class="label">所有列</td>
         </tr>

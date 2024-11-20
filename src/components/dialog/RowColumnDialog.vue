@@ -8,6 +8,17 @@
                     <el-option label="降序" value="desc" />
                 </el-select>
             </el-form-item>
+            <el-form-item label="格式">
+                <el-select v-model="field.format" placeholder="显示格式">
+                    <el-option label="日期" value="date" />
+                    <el-option label="时间" value="time" />
+                    <el-option label="日期和时间" value="datetime" />
+                    <el-option label="整数" value="integer" />
+                    <el-option label="小数" value="decimal" />
+                    <el-option label="金额" value="money" />
+                    <el-option label="百分比" value="percentage" />
+                </el-select>
+            </el-form-item>
         </el-form>
         <template #footer>
             <div class="dialog-footer">
@@ -22,6 +33,7 @@
 <script lang="ts">
 import { ColumnField } from '../../Pivot/Fields/ColumnField';
 import { RowField } from '../../Pivot/Fields/RowField';
+import { Marshal } from '../../Pivot/Utils/Marshal';
 
 export default {
     name: 'RowColumnDialog',
@@ -39,7 +51,7 @@ export default {
                 this.handler(this.field);
         },
         open: function (field: RowField | ColumnField, handler: Function) {
-            this.field = field;
+            this.field = Marshal.clone(field);
             this.handler = handler;
             this.show = true;
         }

@@ -45,7 +45,7 @@ var options = new PivotOptions({
             field: 'status', comparison: 'equals', critera: '已完工'
         },
         {
-            field: 'pack', comparison: 'contains', critera: ['T0', 'T8']
+            field: 'start_time', comparison: 'greater', critera: '2021-01-02'
         }
     ]
 });
@@ -86,7 +86,7 @@ let onScroll = function (e: any) {
             </td>
             <td style="padding: 0">
                 <div v-on:scroll="onScroll" style="height:100%;overflow:auto">
-                    <CellArea :cells="pivot.cells" :data="pivot.cellTree"></CellArea>
+                    <CellArea :cells="pivot.cells" :options="pivot.options"></CellArea>
                 </div>
             </td>
         </tr>

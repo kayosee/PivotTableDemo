@@ -8,8 +8,8 @@
                     <el-option label="降序" value="desc" />
                 </el-select>
             </el-form-item>
-            <el-form-item label="计算">
-                <el-select v-model="field.aggregator" placeholder="排序规则">
+            <el-form-item label="统计">
+                <el-select v-model="field.aggregator" placeholder="统计方法">
                     <el-option label="求和" value="sum" />
                     <el-option label="平均" value="avg" />
                     <el-option label="最大" value="max" />
@@ -19,7 +19,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="格式">
-                <el-select v-model="field.format" placeholder="排序规则">
+                <el-select v-model="field.format" placeholder="显示格式">
                     <el-option label="日期" value="date" />
                     <el-option label="时间" value="time" />
                     <el-option label="日期和时间" value="datetime" />
@@ -42,6 +42,7 @@
 </template>
 <script lang="ts">
 import { ValueField } from '../../Pivot/Fields/ValueField';
+import { Marshal } from '../../Pivot/Utils/Marshal';
 
 export default {
     name: 'ValueDialog',
@@ -59,7 +60,7 @@ export default {
                 this.handler(this.field);
         },
         open: function (field: ValueField, handler: Function) {
-            this.field = field;
+            this.field = Marshal.clone(field);
             this.handler = handler;
             this.show = true;
         }

@@ -1,31 +1,31 @@
 
-.frame {
+.pivot-frame {
     font-size: 15px;
     border-collapse: collapse;
     table-layout: fixed;
 }
-.cell{
+.pivot-cell{
     min-width: 100px;
     height:24px;
     border: 1px solid gray;
     text-align: center;
 }
 
-.frame td, table th {
+.pivot-frame td, .pivot-frame th {
     border: 1px solid gray;
 }
-.frame tr:first-child td {
+.pivot-frame tr:first-child td {
     border-top: 0;
 }
-.frame tr:last-child td {
+.pivot-frame tr:last-child td {
     border-bottom: 0;
 }
-.frame tr td:first-child,
-.frame tr th:first-child {
+.pivot-frame tr td:first-child,
+.pivot-frame tr th:first-child {
     border-left: 0;
 }
-.frame tr td:last-child,
-.frame tr th:last-child {
+.pivot-frame tr td:last-child,
+.pivot-frame tr th:last-child {
     border-right: 0;
 }
 

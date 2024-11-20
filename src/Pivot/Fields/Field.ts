@@ -1,3 +1,4 @@
+import moment from "moment";
 import { DataType } from "../Enums/DataType";
 import { ValueFormat } from "../Enums/ValueFormat";
 
@@ -38,15 +39,15 @@ export class Field {
                 return NA;
             case ValueFormat.date:
                 if ((this.type == DataType.date) && value instanceof Date && !isNaN(value))
-                    return `${value.getFullYear()}-${value.getMonth() + 1}-${value.getDate()}`;
+                    return moment(value).format('YYYY-MM-DD'); //`${value.getFullYear()}-${value.getMonth() + 1}-${value.getDate()}`;
                 return NA;
             case ValueFormat.datetime:
                 if ((this.type == DataType.date || this.type == DataType.datetime) && value instanceof Date && !isNaN(value))
-                    return `${value.getFullYear()}-${value.getMonth() + 1}-${value.getDate()} ${value.getHours()}:${value.getMinutes()}:${value.getSeconds()}`;
+                    return moment(value).format('YYYY-MM-DD HH:MM');//`${value.getFullYear()}-${value.getMonth() + 1}-${value.getDate()} ${value.getHours()}:${value.getMinutes()}:${value.getSeconds()}`;
                 return NA;
             case ValueFormat.time:
                 if ((this.type == DataType.date || this.type == DataType.datetime || this.type == DataType.time) && value instanceof Date && !isNaN(value))
-                    return `${value.getHours()}:${value.getMinutes()}:${value.getSeconds()}`;
+                    return moment(value).format('HH:MM');//`${value.getHours()}:${value.getMinutes()}:${value.getSeconds()}`;
                 return NA;
             case ValueFormat.decimal:
                 if (this.type == DataType.number)

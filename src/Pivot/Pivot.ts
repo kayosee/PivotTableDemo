@@ -71,12 +71,12 @@ export class Pivot {
     private sort() {
         var sort = new Sort(this.columnKeys);
         for (let i = 0; i < this.options.columns.length; i++)
-            sort.orderBy(i.toString(), this.options.columns[i].sort == SortOrder.desc);
+            sort.orderBy(i.toString(), this.options.columns[i].type, this.options.columns[i].sort == SortOrder.desc);
         sort.do();
 
         sort = new Sort(this.rowKeys);
         for (let i = 0; i < this.options.rows.length; i++)
-            sort.orderBy(i.toString(), this.options.rows[i].sort == SortOrder.desc);
+            sort.orderBy(i.toString(), this.options.rows[i].type, this.options.rows[i].sort == SortOrder.desc);
         sort.do();
 
     }
@@ -120,6 +120,7 @@ export class Pivot {
                         else if (temp instanceof Map && temp.has(null))
                             header = temp.get(null) as Summary;
                         if (header != null) {
+                            cell.data = header.data;
                             cell.value = header.values.get(value.name) ?? null;
                             cell.text = value.getText(cell.value);
                             cell.style = value.getStyle(cell.value);
