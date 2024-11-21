@@ -1,6 +1,7 @@
 import { Field } from "../Fields/Field";
 import { DataType } from "../Enums/DataType";
 import { Comparison } from "../Enums/Comparison";
+import moment from "moment";
 
 export class FilterField extends Field {
     compare(f: any) {
@@ -10,10 +11,10 @@ export class FilterField extends Field {
         if (FilterField.comparisons.has(method)) {
             let func = FilterField.comparisons.get(method);
             if ([Comparison.between, Comparison.notBetween].findIndex(f => f == method) > -1)
-                return (func)?.(f[this.name], this.start, this.end);
+                return (func)?.(this.type, f[this.name], this.start, this.end);
             else if ([Comparison.contains, Comparison.notContains].findIndex(f => f == method) > -1)
-                return (func)?.(f[this.name], this.list);
-            return (func)?.(f[this.name], this.critera);
+                return (func)?.(this.type, f[this.name], this.list);
+            return (func)?.(this.type, f[this.name], this.critera);
         }
     }
     critera: string | number | Date | null = null;
@@ -22,13 +23,13 @@ export class FilterField extends Field {
     list: Array<number | Date | string> | null = [];
     comparison: Comparison | Function;
     private static comparisons: Map<string, Function> = new Map<string, Function>([
-        [Comparison.less, function (a: number | Date, b: number | Date) { return a < b; }],
-        [Comparison.lessOrEquals, function (a: number | Date, b: number | Date) { return a <= b; }],
-        [Comparison.greater, function (a: number | Date, b: number | Date) { return a > b; }],
-        [Comparison.greaterOrEquals, function (a: number | Date, b: number | Date) { return a >= b; }],
-        [Comparison.equals, function (a: number | Date, b: number | Date) { return a == b; }],
-        [Comparison.between, function (a: number | Date, b: number | Date, c: number | Date) { return a >= b && a <= c; }],
-        [Comparison.notBetween, function (a: number | Date, b: number | Date, c: number | Date) { return !(a >= b && a <= c); }],
+        [Comparison.less, function (type: DataType, a: number | Date, b: number | Date) { return cast(type, a) < cast(type, b); }],
+        [Comparison.lessOrEquals, function (type: DataType, a: number | Date, b: number | Date) { return cast(type, a) <= cast(type, b); }],
+        [Comparison.greater, function (type: DataType, a: number | Date, b: number | Date) { return cast(type, a) > cast(type, b); }],
+        [Comparison.greaterOrEquals, function (type: DataType, a: number | Date, b: number | Date) { return cast(type, a) >= cast(type, b); }],
+        [Comparison.equals, function (type: DataType, a: number | Date, b: number | Date) { return cast(type, a) == cast(type, b); }],
+        [Comparison.between, function (type: DataType, a: number | Date, b: number | Date, c: number | Date) { return cast(type, a) >= cast(type, b) && cast(type, a) <= cast(type, c); }],
+        [Comparison.notBetween, function (type: DataType, a: number | Date, b: number | Date, c: number | Date) { return !(cast(type, a) >= cast(type, b) && cast(type, a) <= cast(type, c)); }],
         [Comparison.like, function (a: string, b: string) { return new RegExp(b).test(a); }],
         [Comparison.notLike, function (a: string, b: string) { return !new RegExp(b).test(a); }],
         [Comparison.contains, function (a: any, b: Array<number | Date | string>) { return b.findIndex(f => f == a) >= 0; }],
@@ -53,5 +54,21 @@ export class FilterField extends Field {
         }
         else
             this.critera = critera[0];
+    }
+}
+
+function cast(type: DataType, value: number | Date) {
+    switch (type) {
+        case DataType.date:
+        case DataType.datetime:
+            if (moment(value).isValid())
+                return moment(value).valueOf();
+            return 0;
+        case DataType.time:
+            if (moment('2000-01-01 ' + value).isValid())
+                return moment('2000-01-01 ' + value).valueOf();
+            return 0;
+        default:
+            return value;
     }
 }

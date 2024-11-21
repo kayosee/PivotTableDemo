@@ -3,7 +3,6 @@ import { DataType } from "../Enums/DataType";
 import { Aggregator } from "../Enums/Aggregator";
 import { ISortable } from "./ISortable";
 import { SortOrder } from "../Enums/SortOrder";
-import { ValueFormat } from "../Enums/ValueFormat";
 
 export class ValueField extends Field implements ISortable {
     aggregator: Aggregator | Function;

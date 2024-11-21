@@ -8,7 +8,6 @@ import { DATA_TYPE_INVALID } from "./locale";
 import { PivotOptions } from "./PivotOptions";
 import { RowHeader } from "./Headers/RowHeader";
 import { ValueCell } from "./Cells/ValueCell";
-import { Marshal } from "./Utils/Marshal";
 import { Summary } from "./Summary";
 import { Arrays } from "./Utils/Arrays";
 import { Sort } from "./Utils/Sort";
@@ -32,8 +31,7 @@ export class Pivot {
     }
     calc() {
         let options = this.options;
-        let stringFields = options.filters.filter(f => options.fields.findIndex(s => s.name == f.name && s.type == DataType.string) > 0)
-        this.view = this.filter(this.data, stringFields);
+        this.view = this.filter(this.data, options.filters);
 
         this.rowTree = new Map();
         this.genTree(this.rowTree, null, null, options.rows, this.view);

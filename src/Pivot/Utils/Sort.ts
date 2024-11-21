@@ -1,6 +1,6 @@
 import moment from "moment";
 import { DataType } from "../Enums/DataType";
-import { OrderBy } from "./Order";
+import { OrderBy } from "./OrderBy";
 
 export class Sort {
     data: Array<any>;
@@ -75,7 +75,6 @@ export class Sort {
                             result = (b[i.field].toString().localeCompare(a[i.field].toString(), 'zh-Hans-CN', { sensitivity: 'accent' }));
                     }
                 }
-
                 if (result != 0)
                     break;
             }

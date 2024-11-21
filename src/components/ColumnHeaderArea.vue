@@ -1,7 +1,5 @@
 <script lang="ts">
-import { ColumnField } from "../Pivot/Fields/ColumnField";
 import { ValueField } from "../Pivot/Fields/ValueField";
-import { ColumnHeader } from "../Pivot/Headers/ColumnHeader";
 
 export default {
     name: "ColumnHeaderArea",

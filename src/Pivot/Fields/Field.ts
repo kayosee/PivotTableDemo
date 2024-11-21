@@ -11,6 +11,7 @@ export class Field {
 
     format: ValueFormat | null = null;
     formatter: Function | null = null;
+    fraction: number = 2;
     getStyle(value: any): string {
         if (typeof (this.style) == 'function')
             return this.style(value);
@@ -25,33 +26,50 @@ export class Field {
             return '';
 
         switch (this.format) {
+            case ValueFormat.auto:
+                switch (this.type) {
+                    case DataType.date:
+                        if (moment(value).isValid())
+                            return moment(value).format('YYYY-MM-DD');
+                        return value;
+                    case DataType.datetime:
+                        if (moment(value).isValid())
+                            return moment(value).format('YYYY-MM-DD HH:MM');
+                        return value;
+                    case DataType.time:
+                        if (moment(value).isValid())
+                            return moment(value).format('HH:MM');
+                        return value;
+                    default:
+                        return value;
+                }
             case ValueFormat.integer:
                 if (this.type == DataType.number)
                     return value?.toFixed(0);
                 return NA;
             case ValueFormat.money:
                 if (this.type == DataType.number)
-                    return value?.toFixed(2);
+                    return value?.toFixed(2).replace(/(?!^)(?=(\d{3})+$)/g, ',');
                 return NA;
             case ValueFormat.percentage:
                 if (this.type == DataType.number)
                     return ((value * 100).toFixed(4)).toString() + '%';
                 return NA;
             case ValueFormat.date:
-                if ((this.type == DataType.date) && value instanceof Date && !isNaN(value))
+                if (moment(value).isValid())
                     return moment(value).format('YYYY-MM-DD'); //`${value.getFullYear()}-${value.getMonth() + 1}-${value.getDate()}`;
                 return NA;
             case ValueFormat.datetime:
-                if ((this.type == DataType.date || this.type == DataType.datetime) && value instanceof Date && !isNaN(value))
+                if (moment(value).isValid())
                     return moment(value).format('YYYY-MM-DD HH:MM');//`${value.getFullYear()}-${value.getMonth() + 1}-${value.getDate()} ${value.getHours()}:${value.getMinutes()}:${value.getSeconds()}`;
                 return NA;
             case ValueFormat.time:
-                if ((this.type == DataType.date || this.type == DataType.datetime || this.type == DataType.time) && value instanceof Date && !isNaN(value))
+                if (moment(value).isValid())
                     return moment(value).format('HH:MM');//`${value.getHours()}:${value.getMinutes()}:${value.getSeconds()}`;
                 return NA;
             case ValueFormat.decimal:
                 if (this.type == DataType.number)
-                    return value;
+                    return this.fraction ? value.toFixed(this.fraction) : value;
                 return NA;
             case ValueFormat.custom:
                 return this.formatter ?? (value);

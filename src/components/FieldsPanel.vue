@@ -76,6 +76,7 @@ export default {
                         which.format = result.format;
                         which.formatter = result.formatter;
                         which.style = result.style;
+                        which.fraction = result.fraction;
                         me.options.onPropertyChanged();
                     });
                     break;
@@ -87,6 +88,7 @@ export default {
                         which.format = result.format;
                         which.formatter = result.formatter;
                         which.style = result.style;
+                        which.fraction = result.fraction;
                         me.options.onPropertyChanged();
                     });
                     break;
@@ -101,6 +103,7 @@ export default {
                         which.format = result.format;
                         which.formatter = result.formatter;
                         which.style = result.style;
+                        which.fraction = result.fraction;
                         me.options.onPropertyChanged();
                     });
                     break;

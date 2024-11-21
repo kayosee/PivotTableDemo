@@ -86,7 +86,7 @@ let onScroll = function (e: any) {
             </td>
             <td style="padding: 0">
                 <div v-on:scroll="onScroll" style="height:100%;overflow:auto">
-                    <CellArea :cells="pivot.cells" :options="pivot.options"></CellArea>
+                    <CellArea :cells="pivot.cells" :options="options"></CellArea>
                 </div>
             </td>
         </tr>

@@ -1,5 +1,4 @@
 <script lang="ts">
-import { RowHeader } from '../Pivot/Headers/RowHeader';
 
 export default {
     name: 'RowHeaderArea',
