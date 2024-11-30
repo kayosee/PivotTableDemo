@@ -1,6 +1,9 @@
 <template>
     <el-dialog v-model="show" title="字段选项" :align-center="true">
-        <el-form ref="form" :model="field">
+        <el-form ref="form" :model="field" label-width="auto">            
+            <el-form-item label="字段">
+                <el-input v-model="field.title" disabled></el-input>
+            </el-form-item>
             <el-form-item label="方法" prop="comparison" required :rules="[{ required: true, message: '请选择方法' }]">
                 <el-select v-if="field.type == 'number' || field.type == 'date'" v-model="field.comparison">
                     <el-option label="等于" value="equals" />
@@ -77,7 +80,6 @@
 import { nextTick } from 'vue';
 import { ComparisonName } from '../../Pivot/Enums/ComparisonName';
 import { FilterField } from '../../Pivot/Fields/FilterField';
-import { Marshal } from '../../Pivot/Utils/Marshal';
 
 export default {
     name: 'FilterDialog',
@@ -105,7 +107,7 @@ export default {
         },
         open: function (field: FilterField, handler: Function) {
             this.show = true;
-            this.field = Marshal.clone(field);
+            this.field = new FilterField(field.name,field.title,field.type,field.index,field.style,field.comparison);
             this.handler = handler;
         },
         handleClose: function (tag: string | Date | number) {

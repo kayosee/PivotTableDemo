@@ -18,16 +18,17 @@ export default {
             let last = this.headers[this.headers.length - 1];
             let result: Array<any> = [];
             for (let i = 0; i < last.length; i++) {
-                let item: any = {};
-                item.keys = [];
                 for (let value of this.valueFields) {
+                    let item: any = {};
+                    item.keys = [];
                     for (let j = 0; j < this.headers.length - 1; j++) {
                         item.keys.push(this.headers[j][i])
                     }
                     item.field = value.name;
-                    item.title = value.title;
+                    item.title = value.title; 
+                    result.push(item);
                 }
-                result.push(item);
+
             }
             return result;
         }
@@ -38,7 +39,7 @@ export default {
 
     <table class="pivot-frame">
         <tr class="row" v-for="row in headers">
-            <td :colspan="valueFields.length" class="cell" v-for="cell in row">{{ cell }}</td>
+            <td :colspan="valueFields.length" class="pivot-cell" v-for="cell in row">{{ cell }}</td>
             <td><span class="placeholder"></span></td>
         </tr>
         <tr class="row">

@@ -1,6 +1,9 @@
 <template>
     <el-dialog v-model="show" title="字段选项" :align-center="true">
-        <el-form :model="field" ref="form">
+        <el-form :model="field" ref="form" label-width="auto">
+            <el-form-item label="字段">
+                <el-input v-model="field.title" disabled></el-input>
+            </el-form-item>
             <el-form-item label="排序" prop="sort" required>
                 <el-select v-model="field.sort" placeholder="排序规则">
                     <el-option label="不排序" value="none" />
@@ -20,7 +23,8 @@
                     <el-option label="百分比" value="percentage" />
                 </el-select>
             </el-form-item>
-            <el-form-item v-if="field.type=='number'&&field.format=='decimal'" label="小数位" prop="fraction" required>
+            <el-form-item v-if="field.type == 'number' && field.format == 'decimal'" label="小数位" prop="fraction"
+                required>
                 <el-input-number v-model="field.fraction" min="0"></el-input-number>
             </el-form-item>
         </el-form>
@@ -37,8 +41,7 @@
 <script lang="ts">
 import { ColumnField } from '../../Pivot/Fields/ColumnField';
 import { RowField } from '../../Pivot/Fields/RowField';
-import { Marshal } from '../../Pivot/Utils/Marshal';
-
+import { Field } from '../../Pivot/Fields/Field';
 export default {
     name: 'RowColumnDialog',
     data: function () {
@@ -58,8 +61,12 @@ export default {
                 }
             });
         },
-        open: function (field: RowField | ColumnField, handler: Function) {
-            this.field = Marshal.clone(field);
+        open: function (field: RowField | Field, handler: Function) {
+            if (field instanceof RowField)
+                this.field = new ColumnField(field.name, field.title, field.type, field.index, field.style, field.format, field.formatter, field.sort);
+            else
+                this.field = new ColumnField(field.name, field.title, field.type, field.index, field.style, field.format, field.formatter, "asc");
+            
             this.handler = handler;
             this.show = true;
         }

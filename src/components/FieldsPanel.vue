@@ -7,11 +7,13 @@ import { RowField } from '../Pivot/Fields/RowField';
 import { FilterField } from '../Pivot/Fields/FilterField';
 import { ValueField } from '../Pivot/Fields/ValueField';
 import FilterDialog from './dialog/FilterDialog.vue'
-import RowColumnDialog from './dialog/RowColumnDialog.vue';
+import ColumnDialog from './dialog/ColumnDialog.vue';
+import RowDialog from './dialog/RowDialog.vue';
 import ValueDialog from './dialog/ValueDialog.vue';
 export default {
     components: {
-        RowColumnDialog,
+        ColumnDialog,
+        RowDialog,
         ValueDialog,
         FilterDialog
     },
@@ -39,7 +41,6 @@ export default {
             var from: Area = e.dataTransfer.getData('from');
             var field: string = e.dataTransfer.getData('field');
             this.moveField(from, area as Area, this.getIndex(e), field);
-            this.$forceUpdate();
         },
         getIndex: function (e: any): number {
             if (e.target.nodeName == 'TD') {
@@ -59,18 +60,50 @@ export default {
                 return index + 1;
         },
         moveField: function (from: Area, to: Area, index: number, fieldName: string) {
-            if (to == Area.column || to == Area.row || to == Area.field) {
-                var field: Field | undefined = this.options.fields.find(f => f.name == fieldName);
-                if (field != undefined)
-                    this.options.moveField(from, to, index, field);
+            let me = this;
+            let field: Field | undefined = this.options.fields.find(f => f.name == fieldName);
+            let dialog: any = null;
+            if (field != undefined) {
+                if (to == Area.field) {
+                    me.options.moveField(from, to, index, field);                    
+                    me.$forceUpdate();
+                    return;
+                }
+                
+                if (to == Area.column) {
+                    dialog = this.$refs.columnDialog;
+                }
+                else if (to == Area.row) {
+                    dialog = this.$refs.rowlumnDialog;
+                }
+                else if (to == Area.filter) {
+                    dialog = this.$refs.filterDialog;
+                }
+                else if (to == Area.value) {
+                    dialog = this.$refs.valueDialog;
+                }
+                dialog.open(field, function (result: FilterField) {
+                    me.options.moveField(from, to, index, result);
+                    me.$forceUpdate();
+                });
             }
         },
         setFieldOptions: function (area: string, field: RowField | ColumnField | FilterField | ValueField) {
             let me = this;
             switch (area) {
                 case Area.column:
+                    this.$refs.columnDialog.open(field, function (result: RowField | ColumnField) {
+                        let which = field as RowField | ColumnField;
+                        which.sort = result.sort;
+                        which.format = result.format;
+                        which.formatter = result.formatter;
+                        which.style = result.style;
+                        which.fraction = result.fraction;
+                        me.options.onPropertyChanged();
+                    });
+                    break;
                 case Area.row:
-                    this.$refs.rowColumnDialog.open(field, function (result: RowField | ColumnField) {
+                    this.$refs.rowDialog.open(field, function (result: RowField | ColumnField) {
                         let which = field as RowField | ColumnField;
                         which.sort = result.sort;
                         which.format = result.format;
@@ -115,7 +148,8 @@ export default {
 
 <template>
     <FilterDialog ref="filterDialog"></FilterDialog>
-    <RowColumnDialog ref="rowColumnDialog"></RowColumnDialog>
+    <ColumnDialog ref="columnDialog"></ColumnDialog>
+    <RowDialog ref="rowDialog"></RowDialog>
     <ValueDialog ref="valueDialog"></ValueDialog>
     <table class="pivot-frame">
         <tr class="row">

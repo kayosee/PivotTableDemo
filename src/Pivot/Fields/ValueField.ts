@@ -39,7 +39,7 @@ export class ValueField extends Field implements ISortable {
             return (ValueField.aggregators.get(method))?.(rows.map(f => f[this.name]));
         }
     }
-    constructor(name: string, title: string, type: DataType, index: number, style: string, aggregator: string | Function, format: string, formatter: Function, sort: string) {
+    constructor(name: string, title: string, type: DataType, index: number, style: string|Function|null, aggregator: string | Function, format: string|null, formatter: Function|null, sort: string) {
         super(name, title, type, index, style, format, formatter);
         if (typeof (aggregator) == 'string')
             this.aggregator = aggregator as Aggregator;

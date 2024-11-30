@@ -11,16 +11,6 @@
                     <el-option label="降序" value="desc" />
                 </el-select>
             </el-form-item>
-            <el-form-item label="统计" prop="aggregator" required>
-                <el-select v-model="field.aggregator" placeholder="统计方法">
-                    <el-option label="求和" value="sum" />
-                    <el-option label="平均" value="avg" />
-                    <el-option label="最大" value="max" />
-                    <el-option label="最小" value="min" />
-                    <el-option label="计数" value="count" />
-                    <el-option label="按键计数" value="distcount" />
-                </el-select>
-            </el-form-item>
             <el-form-item label="格式" prop="format" required>
                 <el-select v-model="field.format" placeholder="显示格式">
                     <el-option label="自动" value="auto" />
@@ -33,10 +23,11 @@
                     <el-option label="百分比" value="percentage" />
                 </el-select>
             </el-form-item>
-        </el-form>
-        <el-form-item v-if="field.type=='number'&&field.format=='decimal'" label="小数位" prop="fraction" required>
-                <el-input-number v-model="field.fraction" :min="min"></el-input-number>
+            <el-form-item v-if="field.type == 'number' && field.format == 'decimal'" label="小数位" prop="fraction"
+                required>
+                <el-input-number v-model="field.fraction" min="0"></el-input-number>
             </el-form-item>
+        </el-form>
         <template #footer>
             <div class="dialog-footer">
                 <el-button @click="show = false">取消</el-button>
@@ -48,15 +39,16 @@
     </el-dialog>
 </template>
 <script lang="ts">
-import { ValueField } from '../../Pivot/Fields/ValueField';
+import { ColumnField } from '../../Pivot/Fields/ColumnField';
+import { RowField } from '../../Pivot/Fields/RowField';
+import { Field } from '../../Pivot/Fields/Field';
 export default {
-    name: 'ValueDialog',
+    name: 'RowColumnDialog',
     data: function () {
         return {
             show: false,
             field: null,
             handler: null,
-            min:0
         }
     },
     methods: {
@@ -69,8 +61,12 @@ export default {
                 }
             });
         },
-        open: function (field: ValueField, handler: Function) {
-            this.field = new ValueField(field.name,field.title,field.type,field.index,field.style,field.aggregator,field.format,field.formatter,field.sort);
+        open: function (field: ColumnField | Field, handler: Function) {
+            if (field instanceof ColumnField)
+                this.field = new RowField(field.name, field.title, field.type, field.index, field.style, field.format, field.formatter, field.sort);
+            else
+                this.field = new RowField(field.name, field.title, field.type, field.index, field.style, field.format, field.formatter, "asc");
+            
             this.handler = handler;
             this.show = true;
         }

@@ -53,7 +53,7 @@ export class PivotOptions {
             if (field == null) {
                 throw FIELD_NOT_EXISTS;
             }
-            this.rows.push(new RowField(field.name, field.title, field.type, i, row.style, row.sort, row.format, row.formatter));
+            this.rows.push(new RowField(field.name, field.title, field.type, i, row.style, row.format, row.formatter, row.sort));
         }
 
         for (let i = 0; i < options.values.length; i++) {
@@ -76,67 +76,15 @@ export class PivotOptions {
     }
 
     public moveField(from: Area, to: Area, toIndex: number, field: Field): boolean {
-        let toArray: Array<Field> | null = null;
-        switch (to) {
-            case Area.column:
-                toArray = this.columns;
-                break;
-            case Area.filter:
-                toArray = this.filters;
-                break;
-            case Area.row:
-                toArray = this.rows;
-                break;
-            case Area.value:
-                toArray = this.values;
-                break;
-            case Area.field:
-                return this.removeField(from, field);
-            default:
-                return false;
-        }
-
-        let fromArray: Array<Field> | null = null;
-        switch (from) {
-            case Area.column:
-                fromArray = this.columns;
-                break;
-            case Area.filter:
-                fromArray = this.filters;
-                break;
-            case Area.row:
-                fromArray = this.rows;
-                break;
-            case Area.value:
-                fromArray = this.values;
-                break;
-            case Area.field:
-                return this.addField(to, toIndex, field);
-            default:
-                return false;
-        }
-
-        let fromIndex = -1;
-        if (fromArray != null) {
-            fromIndex = fromArray.findIndex(f => f.name == field.name);
-            if (fromIndex < 0)
-                return false;
-        }
-
-        if (fromArray && toArray) {
-            if (toArray.find(f => f.name == field.name))
-                return false;
-
-            toArray.splice(toIndex, 0, field);
-            fromArray.splice(fromIndex, 1);
+        let result = this.removeField(from, field) || this.addField(to, toIndex, field);
+        if (result) {
             if (this.onPropertyChanged != null)
                 this.onPropertyChanged();
-            return true;
         }
-        return false;
+        return result;
     }
 
-    public removeField(from: Area, field: Field): boolean {
+    private removeField(from: Area, field: Field): boolean {
         let fromArray: Array<Field> | null = null;
         switch (from) {
             case Area.column:
@@ -163,12 +111,10 @@ export class PivotOptions {
             else
                 return false;
         }
-        if (this.onPropertyChanged != null)
-            this.onPropertyChanged();
         return true;
     }
 
-    public addField(to: Area, pos: number, field: Field): boolean {
+    private addField(to: Area, pos: number, field: Field): boolean {
         let toArray: Array<Field> | null = null;
         switch (to) {
             case Area.column:
@@ -188,6 +134,9 @@ export class PivotOptions {
         }
 
         if (toArray != null) {
+            if (toArray.find(f => f.name == field.name))
+                return false;
+
             if (pos < 0)
                 toArray.splice(0, 0, field)
             else if (pos > toArray.length)
@@ -195,8 +144,6 @@ export class PivotOptions {
             else
                 toArray.splice(pos, 0, field)
         }
-        if (this.onPropertyChanged != null)
-            this.onPropertyChanged();
         return true;
     }
 }

@@ -5,7 +5,7 @@ import { ISortable } from "./ISortable";
 
 export class ColumnField extends Field implements ISortable {
     sort: SortOrder;
-    constructor(name: string, title: string, type: DataType, index: number, style: string, sort: string, format: string, formatter: Function) {
+    constructor(name: string, title: string, type: DataType, index: number, style: string|Function|null, format: string|null, formatter: Function|null, sort: string) {
         super(name, title, type, index, style, format, formatter);
         this.style = style;
         if (sort == 'desc')
