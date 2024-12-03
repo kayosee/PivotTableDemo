@@ -10,10 +10,12 @@ export class FilterField extends Field {
         var method = this.comparison.toString();
         if (FilterField.comparisons.has(method)) {
             let func = FilterField.comparisons.get(method);
-            if ([Comparison.between, Comparison.notBetween].findIndex(f => f == method) > -1)
+            if ([Comparison.between, Comparison.notBetween].find(f => f == method))
                 return (func)?.(this.type, f[this.name], this.start, this.end);
-            else if ([Comparison.contains, Comparison.notContains].findIndex(f => f == method) > -1)
+            else if ([Comparison.contains, Comparison.notContains].find(f => f == method))
                 return (func)?.(this.type, f[this.name], this.list);
+            else if ([Comparison.like, Comparison.notLike].find(f => f == method))
+                return (func)?.(f[this.name], this.critera);
             return (func)?.(this.type, f[this.name], this.critera);
         }
     }
@@ -35,25 +37,17 @@ export class FilterField extends Field {
         [Comparison.contains, function (a: any, b: Array<number | Date | string>) { return b.findIndex(f => f == a) >= 0; }],
         [Comparison.notContains, function (a: any, b: Array<number | Date | string>) { return b.findIndex(f => f == a) == -1; }]
     ])
-    constructor(name: string, title: string, type: DataType, index: number, style: string | Function | null, comparison: string | Function, ...critera: string[] | number[] | Date[]) {
+    constructor(name: string, title: string, type: DataType, index: number, style: string | Function | null, comparison: string | Function, critera: string | number | Date | null, start: number | Date | null, end: number | Date | null, list: Array<number | Date | string> | null) {
         super(name, title, type, index, style, null, null);
         if (typeof (comparison) == 'string')
             this.comparison = comparison as Comparison;
         else
             this.comparison = comparison;
 
-        if ([Comparison.between, Comparison.notBetween].find(f => f == this.comparison)) {
-            if ((typeof (critera[0]) == 'number' && typeof (critera[1]) == 'number') ||
-                (critera[0] instanceof Date && critera[1] instanceof Date)) {
-                this.start = critera[0];
-                this.end = critera[1];
-            }
-        } else if ([Comparison.contains, Comparison.notContains].find(f => f == this.comparison)) {
-            if (critera[0] instanceof Array)
-                this.list = critera[0];
-        }
-        else
-            this.critera = critera[0];
+        this.critera = critera;
+        this.start = start;
+        this.end = end;
+        this.list = list;
     }
 }
 

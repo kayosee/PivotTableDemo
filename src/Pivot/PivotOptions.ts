@@ -71,12 +71,12 @@ export class PivotOptions {
             if (field == null) {
                 throw FIELD_NOT_EXISTS;
             }
-            this.filters.push(new FilterField(field.name, field.title, field.type, i, field.style, filter.comparison, filter.critera));
+            this.filters.push(new FilterField(field.name, field.title, field.type, i, field.style, filter.comparison, filter.critera, filter.start, filter.end, filter.list));
         }
     }
 
     public moveField(from: Area, to: Area, toIndex: number, field: Field): boolean {
-        let result = this.removeField(from, field) || this.addField(to, toIndex, field);
+        let result = (this.removeField(from, field) , this.addField(to, toIndex, field));
         if (result) {
             if (this.onPropertyChanged != null)
                 this.onPropertyChanged();

@@ -74,7 +74,7 @@ export default {
                     dialog = this.$refs.columnDialog;
                 }
                 else if (to == Area.row) {
-                    dialog = this.$refs.rowlumnDialog;
+                    dialog = this.$refs.rowDialog;
                 }
                 else if (to == Area.filter) {
                     dialog = this.$refs.filterDialog;
