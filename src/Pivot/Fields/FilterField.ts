@@ -23,6 +23,7 @@ export class FilterField extends Field {
     start: number | Date | null = null;
     end: number | Date | null = null;
     list: Array<number | Date | string> | null = [];
+    constants: Array<string> | null = null;
     comparison: Comparison | Function;
     private static comparisons: Map<string, Function> = new Map<string, Function>([
         [Comparison.less, function (type: DataType, a: number | Date, b: number | Date) { return cast(type, a) < cast(type, b); }],
@@ -37,7 +38,7 @@ export class FilterField extends Field {
         [Comparison.contains, function (a: any, b: Array<number | Date | string>) { return b.findIndex(f => f == a) >= 0; }],
         [Comparison.notContains, function (a: any, b: Array<number | Date | string>) { return b.findIndex(f => f == a) == -1; }]
     ])
-    constructor(name: string, title: string, type: DataType, index: number, style: string | Function | null, comparison: string | Function, critera: string | number | Date | null, start: number | Date | null, end: number | Date | null, list: Array<number | Date | string> | null) {
+    constructor(name: string, title: string, type: DataType, index: number, style: string | Function | null, comparison: string | Function, critera: string | number | Date | null, start: number | Date | null, end: number | Date | null, list: Array<number | Date | string> | null,constants:Array<string>|null) {
         super(name, title, type, index, style, null, null);
         if (typeof (comparison) == 'string')
             this.comparison = comparison as Comparison;
@@ -48,6 +49,7 @@ export class FilterField extends Field {
         this.start = start;
         this.end = end;
         this.list = list;
+        this.constants=constants;
     }
 }
 

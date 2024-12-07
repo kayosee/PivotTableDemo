@@ -12,6 +12,7 @@ import { Summary } from "./Summary";
 import { Arrays } from "./Utils/Arrays";
 import { Sort } from "./Utils/Sort";
 import { SortOrder } from "./Enums/SortOrder";
+import { Area } from "./Enums/Area";
 
 
 export class Pivot {
@@ -26,6 +27,8 @@ export class Pivot {
     cellTree: Map<string | null, any> = new Map();
     columnTree: Map<string | null, any> = new Map();
     columnKeys: Array<Array<string | null>> = [];
+    
+    onPropertyChanged: Function | null = null;
     constructor(options: PivotOptions) {
         this.options = options;
     }
@@ -168,6 +171,9 @@ export class Pivot {
         let result: Array<any> = data;
         for (let i = 0; i < filters.length; i++) {
             let filter = filters[i];
+            debugger;
+            if (filter.type == DataType.string)
+                filter.constants = Arrays.distinct(this.data, filter.name);
             result = result.filter(f => filter.compare(f));
         }
         return result;
@@ -207,5 +213,17 @@ export class Pivot {
                 this.genKey(i[1] as Map<string, any>, [...temp, i[0]], result, length)
             }
         }
+    }
+
+    public moveField(from: Area, to: Area, toIndex: number, field: Field): boolean {
+        var result = this.options.moveField(from, to, toIndex, field);
+        if (result == true) {
+            this.calc();
+            if (to == Area.filter) {
+                (field as FilterField).constants = Arrays.distinct(this.view, field.name);
+            }
+        }
+        return result;
+
     }
 }

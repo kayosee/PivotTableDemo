@@ -8,7 +8,6 @@ import ColumnHeaderArea from './ColumnHeaderArea.vue';
 import RowHeaderArea from './RowHeaderArea.vue';
 import FieldsPanel from './FieldsPanel.vue';
 var options = new PivotOptions({
-    canvas: 'cc',
     showFieldsPanel: 'right',
     fields: [
         { name: 'item_code', title: '代码', type: 'string' },
@@ -52,7 +51,7 @@ var options = new PivotOptions({
 
 var pivot = reactive(new Pivot(options));
 pivot.load(data);
-pivot.options.onPropertyChanged = function () {
+pivot.onPropertyChanged = function () {
     pivot.calc();
     const instance = getCurrentInstance();
     instance?.proxy?.$forceUpdate();
@@ -75,7 +74,7 @@ let onScroll = function (e: any) {
                 </ColumnHeaderArea>
             </td>
             <td rowspan="2">
-                <FieldsPanel :options="options"></FieldsPanel>
+                <FieldsPanel :pivot="pivot"></FieldsPanel>
             </td>
         </tr>
         <tr>
@@ -91,7 +90,6 @@ let onScroll = function (e: any) {
             </td>
         </tr>
     </table>
-
 </template>
 <style scoped>
 .holder {

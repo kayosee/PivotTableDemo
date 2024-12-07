@@ -27,7 +27,9 @@
             <el-form-item prop="critera" :label="getName(field.comparison)"
                 :rules="[{ required: true, message: '请输入内容' }]"
                 v-if="['equals', 'notEquals', 'greater', 'greaterOrEquals', 'less', 'lessOrEquals', 'like', 'notLike'].find(f => f == field.comparison)">
-                <el-input v-if="field.type == 'string'" v-model="field.critera"></el-input>
+                <el-select v-if="['equals', 'notEquals'].find(f=>f==field.comparison)&&field.type == 'string'" v-model="field.critera" allow-create filterable>
+                    <el-option v-for="item in field.constants" :key="item" :label="item" :value="item"></el-option>
+                </el-select>
                 <el-input-number v-if="field.type == 'number'" v-model="field.critera"></el-input-number>
                 <el-date-picker type="date" v-if="field.type == 'date'" v-model="field.critera"></el-date-picker>
                 <el-date-picker type="datetime" v-if="field.type == 'datetime'"
@@ -117,7 +119,7 @@ export default {
         },
         open: function (field: FilterField, handler: Function) {
             this.show = true;
-            this.field = new FilterField(field.name, field.title, field.type, field.index, field.style, field.comparison, field.critera, field.start, field.end, field.list);
+            this.field = new FilterField(field.name, field.title, field.type, field.index, field.style, field.comparison, field.critera, field.start, field.end, field.list,field.constants);
             this.handler = handler;
         },
         handleClose: function (tag: string | Date | number) {

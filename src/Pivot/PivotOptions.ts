@@ -17,7 +17,6 @@ export class PivotOptions {
     height: Number = 600;
     nullValue: string = "(空白)";
     showFieldsPanel: ShowFieldsPanel = ShowFieldsPanel.right;
-    onPropertyChanged: Function | null = null;
     constructor(options: any) {
         if (options.hasOwnProperty("nullValue"))
             this.nullValue = options["nullValue"];
@@ -71,17 +70,12 @@ export class PivotOptions {
             if (field == null) {
                 throw FIELD_NOT_EXISTS;
             }
-            this.filters.push(new FilterField(field.name, field.title, field.type, i, field.style, filter.comparison, filter.critera, filter.start, filter.end, filter.list));
+            this.filters.push(new FilterField(field.name, field.title, field.type, i, field.style, filter.comparison, filter.critera, filter.start, filter.end, filter.list,null));
         }
     }
 
     public moveField(from: Area, to: Area, toIndex: number, field: Field): boolean {
-        let result = (this.removeField(from, field) , this.addField(to, toIndex, field));
-        if (result) {
-            if (this.onPropertyChanged != null)
-                this.onPropertyChanged();
-        }
-        return result;
+        return (this.addField(to, toIndex, field) && this.removeField(from, field))||false;
     }
 
     private removeField(from: Area, field: Field): boolean {
