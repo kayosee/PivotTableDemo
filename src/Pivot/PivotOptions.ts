@@ -61,7 +61,7 @@ export class PivotOptions {
             if (field == null) {
                 throw FIELD_NOT_EXISTS;
             }
-            this.values.push(new ValueField(field.name, field.title, field.type, i, value.style, value.aggregator, value.format, value.formatter, value.sort));
+            this.values.push(new ValueField(field.name, field.title, field.type, i, value.style, value.aggregator, value.distinct,value.keys, value.format, value.formatter, value.sort));
         }
 
         for (let i = 0; i < options.filters.length; i++) {
@@ -70,12 +70,12 @@ export class PivotOptions {
             if (field == null) {
                 throw FIELD_NOT_EXISTS;
             }
-            this.filters.push(new FilterField(field.name, field.title, field.type, i, field.style, filter.comparison, filter.critera, filter.start, filter.end, filter.list,null));
+            this.filters.push(new FilterField(field.name, field.title, field.type, i, field.style, filter.comparison, filter.critera, filter.start, filter.end, filter.list, null));
         }
     }
 
     public moveField(from: Area, to: Area, toIndex: number, field: Field): boolean {
-        return (this.addField(to, toIndex, field) && this.removeField(from, field))||false;
+        return ((this.addField(to, toIndex, field) ? 1 : 0) | (this.removeField(from, field) ? 1 : 0)) == 1;
     }
 
     private removeField(from: Area, field: Field): boolean {

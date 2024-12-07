@@ -28,7 +28,7 @@ export default {
             type: Pivot,
             default: {}
         },
-        
+
     },
     methods: {
         allowDrop: function (e: any) {
@@ -67,11 +67,11 @@ export default {
             let dialog: any = null;
             if (field != undefined) {
                 if (to == Area.field) {
-                    me.pivot.moveField(from, to, index, field);                    
+                    me.pivot.moveField(from, to, index, field);
                     me.$forceUpdate();
                     return;
                 }
-                
+
                 if (to == Area.column) {
                     if (this.pivot.options.columns.find(f => f.name == fieldName))
                         return;
@@ -85,7 +85,7 @@ export default {
                 else if (to == Area.filter) {
                     if (this.pivot.options.filters.find(f => f.name == fieldName))
                         return;
-                    field.constants=Arrays.distinct(this.pivot.data,field.name);
+                    (field as FilterField).constants = Arrays.distinct(this.pivot.data, field.name);
                     dialog = this.$refs.filterDialog;
                 }
                 else if (to == Area.value) {
@@ -96,7 +96,7 @@ export default {
                 dialog.open(field, function (result: Field) {
                     me.pivot.moveField(from, to, index, result);
                     me.$forceUpdate();
-                });
+                }, [...this.pivot.options.fields]);
             }
         },
         setFieldOptions: function (area: string, field: RowField | ColumnField | FilterField | ValueField) {
@@ -128,18 +128,20 @@ export default {
                     this.$refs.valueDialog.open(field, function (result: ValueField) {
                         let which = field as ValueField;
                         which.aggregator = result.aggregator;
+                        which.distinct = result.distinct;
+                        which.keys = result.keys;
                         which.sort = result.sort;
                         which.format = result.format;
                         which.formatter = result.formatter;
                         which.style = result.style;
                         which.fraction = result.fraction;
                         me.pivot.calc();
-                    });
+                    }, [...this.pivot.options.fields]);
                     break;
                 case Area.filter:
                     this.$refs.filterDialog.open(field, function (result: FilterField) {
                         let which = field as FilterField;
-                        which.comparison = result.comparison;                        
+                        which.comparison = result.comparison;
                         which.critera = result.critera;
                         which.start = result.start;
                         which.end = result.end;
@@ -180,7 +182,8 @@ export default {
             <td class="label">行列</td>
         </tr>
         <tr class="row">
-            <td v-on:drop="(e) => drop(e, 'filter')" v-on:dragover="allowDrop" :field-count="pivot.options.filters.length">
+            <td v-on:drop="(e) => drop(e, 'filter')" v-on:dragover="allowDrop"
+                :field-count="pivot.options.filters.length">
                 <div class="field" v-for="(field, index) in pivot.options.filters" draggable="true"
                     v-on:click="setFieldOptions('filter', field)" v-on:dragstart="(e) => drag(e, 'filter', field)"
                     :field-index="index">
@@ -200,14 +203,16 @@ export default {
             <td class="label">数值</td>
         </tr>
         <tr class="row">
-            <td v-on:drop="(e) => drop(e, 'column')" v-on:dragover="allowDrop" :field-count="pivot.options.columns.length">
+            <td v-on:drop="(e) => drop(e, 'column')" v-on:dragover="allowDrop"
+                :field-count="pivot.options.columns.length">
                 <div class="field" v-for="(field, index) in pivot.options.columns" draggable="true"
                     v-on:click="setFieldOptions('column', field)" v-on:dragstart="(e) => drag(e, 'column', field)"
                     :field-index="index">
                     <label>{{ field.title }}</label>
                 </div>
             </td>
-            <td v-on:drop="(e) => drop(e, 'value')" v-on:dragover="allowDrop" :field-count="pivot.options.values.length">
+            <td v-on:drop="(e) => drop(e, 'value')" v-on:dragover="allowDrop"
+                :field-count="pivot.options.values.length">
                 <div class="field" v-for="(field, index) in pivot.options.values" draggable="true"
                     v-on:click="setFieldOptions('value', field)" v-on:dragstart="(e) => drag(e, 'value', field)"
                     :field-index="index">

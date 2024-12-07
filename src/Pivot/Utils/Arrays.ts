@@ -2,6 +2,17 @@ export class Arrays{
     static distinct(data: Array<any>, prop: string): Array<any> {
         return data.map(f => f[prop]).filter((value, index, array) => array.indexOf(value) == index);
     }
+    static distinctAll(data: Array<any>): Array<any> {
+        let newArr = [];
+        let obj: any = {};
+        for (let i = 0; i < data.length; i++) {
+            if (!obj[JSON.stringify(data[i])]) {
+                newArr.push(data[i]);
+                obj[JSON.stringify(data[i])] = true;
+            }
+        }
+        return newArr;
+    }
 
     static group(fields: Array<string>, data: Array<any>, result: any) {
         if (fields.length == 0 || result == null)

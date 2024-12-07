@@ -27,7 +27,7 @@ export class Pivot {
     cellTree: Map<string | null, any> = new Map();
     columnTree: Map<string | null, any> = new Map();
     columnKeys: Array<Array<string | null>> = [];
-    
+
     onPropertyChanged: Function | null = null;
     constructor(options: PivotOptions) {
         this.options = options;
@@ -171,7 +171,7 @@ export class Pivot {
         let result: Array<any> = data;
         for (let i = 0; i < filters.length; i++) {
             let filter = filters[i];
-            debugger;
+            
             if (filter.type == DataType.string)
                 filter.constants = Arrays.distinct(this.data, filter.name);
             result = result.filter(f => filter.compare(f));

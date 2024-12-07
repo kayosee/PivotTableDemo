@@ -12,6 +12,10 @@ var options = new PivotOptions({
     fields: [
         { name: 'item_code', title: '代码', type: 'string' },
         { name: 'item_name', title: '名称', type: 'string' },
+        { name: 'plan_task_no', title: '生产任务号', type: 'string' },
+        { name: 'product_task', title: '工单号', type: 'string' },
+        { name: 'task_no', title: '批次号', type: 'string' },
+        { name: 'plan_qty', title: '计划数量', type: 'number' },
         { name: 'complete_qty', title: '完成数量', type: 'number' },
         { name: 'inferior_qty', title: '次品数量', type: 'number' },
         { name: 'stall', title: '精度', type: 'string' },
@@ -21,6 +25,7 @@ var options = new PivotOptions({
         { name: 'route', title: '工艺路线', type: 'string' },
         { name: 'start_time', title: '开工时间', type: 'date', format: 'date' },
         { name: 'end_time', title: '报工时间', type: 'date', format: 'date' },
+
     ],
     columns: [
         // { field: 'pack', style: {} },

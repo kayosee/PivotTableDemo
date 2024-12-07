@@ -21,6 +21,14 @@
                     <el-option label="按键计数" value="distcount" />
                 </el-select>
             </el-form-item>
+            <el-form-item label="去重" prop="distinct">
+                <el-checkbox v-model="field.distinct"></el-checkbox>
+            </el-form-item>
+            <el-form-item label="按键" prop="keys">
+                <el-select v-model="field.keys" placeholder="按键" multiple>
+                    <el-option v-for="key in keys" :key="key.name" :label="key.title" :value="key.name"></el-option>
+                </el-select>
+            </el-form-item>
             <el-form-item label="格式" prop="format" required>
                 <el-select v-model="field.format" placeholder="显示格式">
                     <el-option label="自动" value="auto" />
@@ -34,9 +42,9 @@
                 </el-select>
             </el-form-item>
         </el-form>
-        <el-form-item v-if="field.type=='number'&&field.format=='decimal'" label="小数位" prop="fraction" required>
-                <el-input-number v-model="field.fraction" :min="min"></el-input-number>
-            </el-form-item>
+        <el-form-item v-if="field.type == 'number' && field.format == 'decimal'" label="小数位" prop="fraction" required>
+            <el-input-number v-model="field.fraction" :min="min"></el-input-number>
+        </el-form-item>
         <template #footer>
             <div class="dialog-footer">
                 <el-button @click="show = false">取消</el-button>
@@ -48,6 +56,7 @@
     </el-dialog>
 </template>
 <script lang="ts">
+import { Field } from '../../Pivot/Fields/Field';
 import { ValueField } from '../../Pivot/Fields/ValueField';
 export default {
     name: 'ValueDialog',
@@ -55,8 +64,9 @@ export default {
         return {
             show: false,
             field: null,
+            keys: [],
             handler: null,
-            min:0
+            min: 0
         }
     },
     methods: {
@@ -69,9 +79,10 @@ export default {
                 }
             });
         },
-        open: function (field: ValueField, handler: Function) {
-            this.field = new ValueField(field.name,field.title,field.type,field.index,field.style,field.aggregator,field.format,field.formatter,field.sort);
+        open: function (field: ValueField, handler: Function, keys: Array<Field>) {
+            this.field = new ValueField(field.name, field.title, field.type, field.index, field.style, field.aggregator, field.distinct, field.keys, field.format, field.formatter, field.sort);
             this.handler = handler;
+            this.keys = keys;
             this.show = true;
         }
     }
