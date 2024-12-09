@@ -1,32 +1,29 @@
 
 
-import { ColumnHeader } from "./Headers/ColumnHeader";
 import { DataType } from "./Enums/DataType";
 import { Field } from "./Fields/Field";
 import { FilterField } from "./Fields/FilterField";
 import { DATA_TYPE_INVALID } from "./locale";
 import { PivotOptions } from "./PivotOptions";
-import { RowHeader } from "./Headers/RowHeader";
 import { ValueCell } from "./Cells/ValueCell";
 import { Summary } from "./Summary";
 import { Arrays } from "./Utils/Arrays";
 import { Sort } from "./Utils/Sort";
 import { SortOrder } from "./Enums/SortOrder";
 import { Area } from "./Enums/Area";
+import { Header } from "./Headers/Header";
 
 
 export class Pivot {
     options: PivotOptions;
-    rowHeaders: Array<RowHeader[]> = [];
-    columnHeaders: Array<ColumnHeader[]> = [];
     data: Array<any> = [];
     view: Array<any> = [];
     cells: Array<Array<ValueCell>> = [];
-    rowKeys: Array<Array<string | null>> = [];
+    rowKeys: Array<Array<Header>> = [];
     rowTree: Map<string | null, any> = new Map();
     cellTree: Map<string | null, any> = new Map();
     columnTree: Map<string | null, any> = new Map();
-    columnKeys: Array<Array<string | null>> = [];
+    columnKeys: Array<Array<Header>> = [];
 
     onPropertyChanged: Function | null = null;
     constructor(options: PivotOptions) {
@@ -47,15 +44,15 @@ export class Pivot {
 
         this.rowKeys = [];
         if (this.options.rows.length > 0)
-            this.genKey(this.rowTree as Map<string, any>, [], this.rowKeys, options.rows.length);
+            this.genKey(this.rowTree as Map<string, any>, [], this.rowKeys, options.rows);
         else
-            this.rowKeys = [[null]];
+            this.rowKeys = [[new Header(null,null,0,true,false,null)]];
 
         this.columnKeys = [];
         if (this.options.columns.length > 0)
-            this.genKey(this.columnTree as Map<string, any>, [], this.columnKeys, options.columns.length);
+            this.genKey(this.columnTree as Map<string, any>, [], this.columnKeys, options.columns);
         else
-            this.columnKeys = [[null]];
+            this.columnKeys = [[new Header(null,null,0,true,false,null)]];
 
         this.sort();
         this.cells = [];
@@ -84,6 +81,7 @@ export class Pivot {
     private genCells() {
         let options = this.options;
         let length = options.rows.length + options.columns.length;
+        debugger;
         for (let row of this.rowKeys) {
             let one: Array<ValueCell> = [];
             for (let col of this.columnKeys) {
@@ -93,10 +91,11 @@ export class Pivot {
                     let cell = new ValueCell(value, 0, '', 0, 0);
                     let terminated = false;
                     options.rows.forEach((v, i) => {
-                        cell.rowHeaders.set(v.name, row[i]);
+                        let key:any = row[i].value;
+                        cell.rowHeaders.set(v.name, key);
                         if (!terminated) {
-                            if (temp instanceof Map && temp.has(row[i])) {
-                                temp = temp.get(row[i])
+                            if (temp instanceof Map && temp.has(key)) {
+                                temp = temp.get(key)
                                 step++;
                             }
                             else
@@ -104,17 +103,18 @@ export class Pivot {
                         }
                     });
                     options.columns.forEach((v, i) => {
-                        cell.columnHeaders.set(v.name, col[i]);
+                        let key:any = col[i].value;
+                        cell.columnHeaders.set(v.name, key);
                         if (!terminated) {
-                            if (temp instanceof Map && temp.has(col[i])) {
-                                temp = temp.get(col[i]);
+                            if (temp instanceof Map && temp.has(key)) {
+                                temp = temp.get(key);
                                 step++;
                             }
                             else
                                 terminated = true;
                         }
                     });
-                    if (step == length) {
+                    if (step == length||temp instanceof Summary) {
                         var header: Summary | null = null;
                         if (temp instanceof Summary)
                             header = temp as Summary;
@@ -204,13 +204,15 @@ export class Pivot {
         }
     }
 
-    private genKey(data: Map<string, any>, temp: Array<string>, result: Array<Array<any>>, length: number) {
+    private genKey(data: Map<string, any>, temp: Array<string>, result: Array<Array<any>>, fields: Array<Field>) {
         for (let i of data) {
             if (i[0] == null) {
-                result.push([...temp, ...new Array(length - temp.length).fill(null)])
+                result.push([...temp, ...new Array(fields.length - temp.length).fill(null)].map((v, i) =>
+                    new Header(fields[i], v, i, v === null, false, "")
+                ))
             }
             if (i[1] instanceof Map) {
-                this.genKey(i[1] as Map<string, any>, [...temp, i[0]], result, length)
+                this.genKey(i[1] as Map<string, any>, [...temp, i[0]], result, fields)
             }
         }
     }

@@ -45,18 +45,21 @@ export default {
             this.moveField(from, area as Area, this.getIndex(e), field);
         },
         getIndex: function (e: any): number {
-            if (e.target.nodeName == 'TD') {
-                if (e.y < e.target.height / 2)
+            let target = e.target;
+            let rect: DOMRect = target.getBoundingClientRect();
+            if (target.nodeName == 'TD') {
+                if (e.y < rect.top + (rect.height / 2))
                     return 0;
                 else
-                    return e.target.attributes['field-count'].value;
+                    return target.attributes['field-count'].value;
             }
-            var target: any = e.target;
-            if (e.target.nodeName == 'LABEL') {
-                target = e.target.parentElement;
+
+            if (target.nodeName == 'LABEL') {
+                target = target.parentElement;
             }
+            rect = target.getBoundingClientRect();
             var index: number = parseInt(target.attributes['field-index'].value)
-            if (e.y < target.height / 2)
+            if (e.y < rect.top + (rect.height / 2))
                 return index;
             else
                 return index + 1;
@@ -73,13 +76,9 @@ export default {
                 }
 
                 if (to == Area.column) {
-                    if (this.pivot.options.columns.find(f => f.name == fieldName))
-                        return;
                     dialog = this.$refs.columnDialog;
                 }
                 else if (to == Area.row) {
-                    if (this.pivot.options.rows.find(f => f.name == fieldName))
-                        return;
                     dialog = this.$refs.rowDialog;
                 }
                 else if (to == Area.filter) {
@@ -89,8 +88,6 @@ export default {
                     dialog = this.$refs.filterDialog;
                 }
                 else if (to == Area.value) {
-                    if (this.pivot.options.values.find(f => f.name == fieldName))
-                        return;
                     dialog = this.$refs.valueDialog;
                 }
                 dialog.open(field, function (result: Field) {

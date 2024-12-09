@@ -33,10 +33,10 @@ export class FilterField extends Field {
         [Comparison.equals, function (type: DataType, a: number | Date, b: number | Date) { return cast(type, a) == cast(type, b); }],
         [Comparison.between, function (type: DataType, a: number | Date, b: number | Date, c: number | Date) { return cast(type, a) >= cast(type, b) && cast(type, a) <= cast(type, c); }],
         [Comparison.notBetween, function (type: DataType, a: number | Date, b: number | Date, c: number | Date) { return !(cast(type, a) >= cast(type, b) && cast(type, a) <= cast(type, c)); }],
-        [Comparison.like, function (a: string, b: string) { return new RegExp(b).test(a); }],
-        [Comparison.notLike, function (a: string, b: string) { return !new RegExp(b).test(a); }],
-        [Comparison.contains, function (a: any, b: Array<number | Date | string>) { return b.findIndex(f => f == a) >= 0; }],
-        [Comparison.notContains, function (a: any, b: Array<number | Date | string>) { return b.findIndex(f => f == a) == -1; }]
+        [Comparison.like, function (type: DataType, a: string, b: string) { return new RegExp(b).test(a); }],
+        [Comparison.notLike, function (type: DataType, a: string, b: string) { return !new RegExp(b).test(a); }],
+        [Comparison.contains, function (type: DataType, a: any, b: Array<number | Date | string>) { return b.findIndex(f => f == a) >= 0; }],
+        [Comparison.notContains, function (type: DataType, a: any, b: Array<number | Date | string>) { return b.findIndex(f => f == a) == -1; }]
     ])
     constructor(name: string, title: string, type: DataType, index: number, style: string | Function | null, comparison: string | Function, critera: string | number | Date | null, start: number | Date | null, end: number | Date | null, list: Array<number | Date | string> | null,constants:Array<string>|null) {
         super(name, title, type, index, style, null, null);

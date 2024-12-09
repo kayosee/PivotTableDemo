@@ -30,11 +30,10 @@
                 <el-select v-if="['equals', 'notEquals'].find(f=>f==field.comparison)&&field.type == 'string'" v-model="field.critera" allow-create filterable>
                     <el-option v-for="item in field.constants" :key="item" :label="item" :value="item"></el-option>
                 </el-select>
-                <el-input-number v-if="field.type == 'number'" v-model="field.critera"></el-input-number>
-                <el-date-picker type="date" v-if="field.type == 'date'" v-model="field.critera"></el-date-picker>
-                <el-date-picker type="datetime" v-if="field.type == 'datetime'"
-                    v-model="field.critera"></el-date-picker>
-                <el-time-picker v-if="field.type == 'time'" v-model="field.critera" />
+                <el-input-number style="width: 100%" v-if="field.type == 'number'" v-model="field.critera"></el-input-number>
+                <el-date-picker style="width: 100%" type="date" v-if="field.type == 'date'" v-model="field.critera"></el-date-picker>
+                <el-date-picker style="width: 100%" type="datetime" v-if="field.type == 'datetime'" v-model="field.critera"></el-date-picker>
+                <el-time-picker style="width: 100%" v-if="field.type == 'time'" v-model="field.critera" />
             </el-form-item>
             <el-form-item label="区间" required v-if="['between', 'notBetween'].find(f => f == field.comparison)">
                 <el-col :span="11" class="sub">
@@ -52,7 +51,7 @@
                     <span class="text-gray-500">-</span>
                 </el-col>
                 <el-col :span="11" class="sub">
-                    <el-form-item prop="start" :rules="[{ required: true, message: '请输入内容或选择时间' }]">
+                    <el-form-item prop="end" :rules="[{ required: true, message: '请输入内容或选择时间' }]">
                         <el-input-number style="width: 100%" v-if="field.type == 'number'"
                             v-model="field.end"></el-input-number>
                         <el-date-picker style="width: 100%" type="date" v-if="field.type == 'date'"
@@ -63,18 +62,10 @@
                             v-model="field.end" /></el-form-item>
                 </el-col>
             </el-form-item>
-            <el-form-item label="列表" v-if="['contains', 'notContains'].find(f => f == field.comparison)">
-                <div class="flex gap-2">
-                    <el-tag v-for="tag in field.list" :key="tag" closable :disable-transitions="false"
-                        @close="handleClose(tag)">
-                        {{ tag }}
-                    </el-tag>
-                    <el-input v-if="inputVisible" ref="inputRef" v-model="inputValue" class="w-20" size="small"
-                        @keyup.enter="handleInputConfirm" @blur="handleInputConfirm" />
-                    <el-button v-else class="button-new-tag" size="small" @click="showInput">
-                        添加
-                    </el-button>
-                </div>
+            <el-form-item prop="list" label="列表" v-if="['contains', 'notContains'].find(f => f == field.comparison)">
+                <el-select v-model="field.list" allow-create filterable multiple>
+                    <el-option v-for="item in field.constants" :key="item" :label="item" :value="item"></el-option>
+                </el-select>
             </el-form-item>
         </el-form>
         <template #footer>

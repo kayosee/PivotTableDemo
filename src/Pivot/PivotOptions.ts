@@ -75,7 +75,7 @@ export class PivotOptions {
     }
 
     public moveField(from: Area, to: Area, toIndex: number, field: Field): boolean {
-        return ((this.addField(to, toIndex, field) ? 1 : 0) | (this.removeField(from, field) ? 1 : 0)) == 1;
+        return ((this.removeField(from, field) ? 1 : 0) | (this.addField(to, toIndex, field) ? 1 : 0)) == 1;
     }
 
     private removeField(from: Area, field: Field): boolean {

@@ -1,10 +1,12 @@
 <script lang="ts">
+import { Header } from '../Pivot/Headers/Header';
+
 
 export default {
     name: 'RowHeaderArea',
     props: {
         headers: {
-            type: Array<Array<any>>,
+            type: Array<Array<Header>>,
             default: []
         }
     }
@@ -13,8 +15,11 @@ export default {
 
 <template>
     <table class="pivot-frame">
-        <tr class="row" v-for="row in headers">
-            <td class="pivot-cell" v-for="cell in row">{{ cell }}</td>
+        <tr class="row" v-for="row in headers">            
+            <td class="pivot-cell" v-for="header in row">
+                <div v-if="!header.isTotal">{{ header.value }}</div>
+                <div v-if="header.isTotal==true">合计</div>                
+            </td>
         </tr>
     </table>
 
