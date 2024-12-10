@@ -74,7 +74,6 @@ export default {
                     me.$forceUpdate();
                     return;
                 }
-
                 if (to == Area.column) {
                     dialog = this.$refs.columnDialog;
                 }

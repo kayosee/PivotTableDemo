@@ -61,8 +61,8 @@ export default {
                 }
             });
         },
-        open: function (field: ColumnField | Field, handler: Function) {
-            if (field instanceof ColumnField)
+        open: function (field: RowField | ColumnField | Field, handler: Function) {
+            if (field instanceof ColumnField || field instanceof RowField)
                 this.field = new RowField(field.name, field.title, field.type, field.index, field.style, field.format, field.formatter, field.sort);
             else
                 this.field = new RowField(field.name, field.title, field.type, field.index, field.style, field.format, field.formatter, "asc");

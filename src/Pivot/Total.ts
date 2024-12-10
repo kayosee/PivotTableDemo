@@ -1,4 +1,4 @@
-export class Summary {
+export class Total {
     fieldName: string|null;
     fieldValue: string | null;
     data: Array<any>;

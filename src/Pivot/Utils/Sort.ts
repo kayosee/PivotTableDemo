@@ -8,7 +8,7 @@ export class Sort {
     constructor(data: Array<any>) {
         this.data = data;
     }
-    orderBy(field: string, type: DataType, isDescend: boolean): Sort {
+    orderBy(field: string | Function, type: DataType, isDescend: boolean): Sort {
         this.orders.push(new OrderBy(field, type, isDescend));
         return this;
     }
@@ -16,14 +16,24 @@ export class Sort {
         this.data.sort((a, b) => {
             var result: number = 0;
             for (let i of this.orders) {
-                if (a[i.field] == null || b[i.field] == null) {
-                    if (a[i.field] == null) {
+                let left: any = null;
+                let right: any = null;
+                if (typeof (i.field) == 'function') {
+                    left = i.field(a);
+                    right = i.field(b)
+                }
+                else {
+                    left = a[i.field];
+                    right = b[i.field];
+                }
+                if (left == null || right == null) {
+                    if (left == null) {
                         if (!i.isDescend)
                             result = -1;
                         else
                             result = 1;
                     }
-                    if (b[i.field] == null) {
+                    if (right == null) {
                         if (!i.isDescend)
                             result = 1;
                         else
@@ -33,46 +43,46 @@ export class Sort {
                 else {
                     if ((i.type) == DataType.number) {
                         if (!i.isDescend) {
-                            if (isNaN(Number(a[i.field])))
+                            if (isNaN(Number(left)))
                                 result = 1;
-                            else if (isNaN(Number(b[i.field])))
+                            else if (isNaN(Number(right)))
                                 result - 1;
                             else
-                                result = (a[i.field] - (b[i.field]));
+                                result = (left - (right));
                         }
                         else {
-                            if (isNaN(Number(a[i.field])))
+                            if (isNaN(Number(left)))
                                 result = -1;
-                            else if (isNaN(Number(b[i.field])))
+                            else if (isNaN(Number(right)))
                                 result = 1;
                             else
-                                result = (b[i.field] - (a[i.field]));
+                                result = (right - (left));
                         }
                     }
                     else if ([DataType.date, DataType.datetime, DataType.time].find(f => f == i.type)) {
                         if (!i.isDescend) {
-                            if (!moment(a[i.field]).isValid())
+                            if (!moment(left).isValid())
                                 result = 1;
-                            else if (!moment(b[i.field]).isValid())
+                            else if (!moment(right).isValid())
                                 result = -1;
                             else
-                                result = moment(a[i.field]).valueOf() - moment(b[i.field]).valueOf();
+                                result = moment(left).valueOf() - moment(right).valueOf();
                         }
                         else {
-                            if (!moment(a[i.field]).isValid())
+                            if (!moment(left).isValid())
                                 result = -1;
-                            else if (!moment(b[i.field]).isValid())
+                            else if (!moment(right).isValid())
                                 result = 1;
                             else
-                                result = moment(b[i.field]).valueOf() - moment(a[i.field]).valueOf();
+                                result = moment(right).valueOf() - moment(left).valueOf();
                         }
                     }
                     else //当字符串
                     {
                         if (!i.isDescend)
-                            result = (a[i.field].toString().localeCompare(b[i.field].toString(), 'zh-Hans-CN', { sensitivity: 'accent' }));
+                            result = (left.toString().localeCompare(right.toString(), 'zh-Hans-CN', { sensitivity: 'accent' }));
                         else
-                            result = (b[i.field].toString().localeCompare(a[i.field].toString(), 'zh-Hans-CN', { sensitivity: 'accent' }));
+                            result = (right.toString().localeCompare(left.toString(), 'zh-Hans-CN', { sensitivity: 'accent' }));
                     }
                 }
                 if (result != 0)

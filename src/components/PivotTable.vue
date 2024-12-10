@@ -75,7 +75,7 @@ let onScroll = function (e: any) {
         <tr style="height: 30px;">
             <td></td>
             <td style="width:70%" class="holder columns" v-bind:scrollLeft="scrollLeft">
-                <ColumnHeaderArea :headers="pivot.columnKeys" :left="scrollLeft" :valueFields="options.values">
+                <ColumnHeaderArea :pivot="pivot" :left="scrollLeft">
                 </ColumnHeaderArea>
             </td>
             <td rowspan="2">
@@ -85,7 +85,7 @@ let onScroll = function (e: any) {
         <tr>
             <td style="padding:0">
                 <div style="position: relative;height: 100%;overflow-y: hidden" v-bind:scrollTop="scrollTop">
-                    <RowHeaderArea :headers="pivot.rowKeys" :top="scrollTop"></RowHeaderArea>
+                    <RowHeaderArea :pivot="pivot" :top="scrollTop"></RowHeaderArea>
                 </div>
             </td>
             <td style="padding: 0">

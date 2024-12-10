@@ -1,32 +1,29 @@
 <script lang="ts">
-import { ValueField } from "../Pivot/Fields/ValueField";
-import { Header } from "../Pivot/Headers/Header";
+import { Pivot } from "../Pivot/Pivot";
 
 export default {
     name: "ColumnHeaderArea",
     props: {
-        headers: {
-            type: Array<Array<Header>>,
-            default: () => { }
-        },
-        valueFields: {
-            type: Array<ValueField>,
-            default: []
+        pivot:{
+            type:Pivot,
+            default:{}
         }
     },
     methods: {
         getAggregators(): Array<any> {
-            let last = this.headers[this.headers.length - 1];
+            let headers = this.pivot.columnHeaders;
+            let values = this.pivot.options.values;
+            let last = headers[headers.length - 1];
             let result: Array<any> = [];
             for (let i = 0; i < last.length; i++) {
-                for (let value of this.valueFields) {
+                for (let value of values) {
                     let item: any = {};
                     item.keys = [];
-                    for (let j = 0; j < this.headers.length - 1; j++) {
-                        item.keys.push(this.headers[j][i].value)
+                    for (let j = 0; j < headers.length - 1; j++) {
+                        item.keys.push(headers[j][i].value)
                     }
                     item.field = value.name;
-                    item.title = value.title; 
+                    item.title = value.title;
                     result.push(item);
                 }
             }
@@ -38,8 +35,8 @@ export default {
 <template>
 
     <table class="pivot-frame">
-        <tr class="row" v-for="row in headers">
-            <td :colspan="valueFields.length" class="pivot-cell" v-for="cell in row">{{ cell.value }}</td>
+        <tr class="row" v-for="row in pivot.columnHeaders">
+            <td :colspan="pivot.options.values.length" class="pivot-cell" v-for="cell in row">{{ cell.value }}</td>
             <td><span class="placeholder"></span></td>
         </tr>
         <tr class="row">
