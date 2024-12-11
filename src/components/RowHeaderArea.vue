@@ -17,8 +17,18 @@ export default {
     },
     methods: {
         collapse: function (header: Header) {
-            debugger;
             this.pivot.collapseHeader(header);
+        },
+        getColspan: function (header: Header, index: number) {
+            if (header.value !== null)
+                return 0;
+            return this.pivot.options.rows.length - index;
+        },
+        firstNull:function(row:Array<Header>){
+            let last=row.findIndex(f=>f.value==null);
+            if(last==-1)
+                return row;
+            return row.slice(0,last+1);
         }
     }
 }
@@ -26,10 +36,11 @@ export default {
 
 <template>
     <table class="pivot-frame">
-        <tr class="row" v-for="row in pivot.rowHeaders" :data-id="pivot.isHidden(row)">
-            <td class="pivot-cell" v-for="header in row">
-                <div v-if="header.value!==null">{{ header.value }}</div>
-                <div v-if="header.value===null" v-on:click="collapse(header)">合计</div>
+        <tr class="row" v-for="row in pivot.rowHeaders"
+            :style="{ display: pivot.isHidden(row) ? 'none' : 'table-row' }">
+            <td class="pivot-cell" v-for="(header, j) in firstNull(row)" :colspan="getColspan(header, j)">
+                <div v-if="header.value !== null">{{ header.value }}</div>
+                <div v-if="header.value === null" v-on:click="collapse(header)">合计</div>
             </td>
         </tr>
     </table>

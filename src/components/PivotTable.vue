@@ -28,8 +28,8 @@ var options = new PivotOptions({
 
     ],
     columns: [
-        // { field: 'pack', style: {} },
-        // { field: 'stall', style: {} },
+         { field: 'pack', style: {} },
+         { field: 'stall', style: {} },
     ],
     rows: [
         { field: 'route', style: {} },
@@ -56,8 +56,10 @@ var options = new PivotOptions({
 
 var pivot = reactive(new Pivot(options));
 pivot.load(data);
-pivot.onPropertyChanged = function () {
-    pivot.calc();
+pivot.onPropertyChanged = function (redraw:boolean) {
+    if(redraw)
+        pivot.calc();
+
     const instance = getCurrentInstance();
     instance?.proxy?.$forceUpdate();
 }
@@ -90,7 +92,7 @@ let onScroll = function (e: any) {
             </td>
             <td style="padding: 0">
                 <div v-on:scroll="onScroll" style="height:100%;overflow:auto">
-                    <CellArea :cells="pivot.cells" :options="options"></CellArea>
+                    <CellArea :pivot="pivot"></CellArea>
                 </div>
             </td>
         </tr>

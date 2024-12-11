@@ -1,4 +1,5 @@
 <script lang="ts">
+import { Header } from "../Pivot/Headers/Header";
 import { Pivot } from "../Pivot/Pivot";
 
 export default {
@@ -10,6 +11,23 @@ export default {
         }
     },
     methods: {
+        collapse: function (header: Header) {
+            this.pivot.collapseHeader(header);
+        },
+        getColspan: function (header: Header, index: number) {
+            if (header.value !== null)
+                return 0;
+            return this.pivot.options.rows.length - index;
+        },
+        firstNull:function(row:Array<Header>,index:number){
+            for(var i=0;i<this.pivot.collapseHeader.length-1;i++)
+                if(this.pivot.collapseHeader[i][index].value==null)
+                    break;
+
+            if(i==-1)
+                return row;
+            return row.slice(0,i+1);
+        },
         getAggregators(): Array<any> {
             let headers = this.pivot.columnHeaders;
             let values = this.pivot.options.values;
@@ -35,12 +53,15 @@ export default {
 <template>
 
     <table class="pivot-frame">
-        <tr class="row" v-for="row in pivot.columnHeaders">
-            <td :colspan="pivot.options.values.length" class="pivot-cell" v-for="cell in row">{{ cell.value }}</td>
+        <tr class="row" v-for="(row,i) in pivot.columnHeaders">
+            <td :colspan="pivot.options.values.length" class="pivot-cell" v-for="(header,j) in row"  :rowspan="getColspan(header, j)">
+                <span v-if="header.value!==null">{{ header.value }}</span>
+                <span v-if="header.value===null">合计</span>
+            </td>
             <td><span class="placeholder"></span></td>
         </tr>
         <tr class="row">
-            <td class="pivot-cell" v-for="cell in getAggregators()">{{ cell.title }}</td>
+            <td class="pivot-cell" v-for="header in getAggregators()">{{ header.title }}</td>
             <td><span class="placeholder"></span></td>
         </tr>
     </table>

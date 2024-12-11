@@ -24,7 +24,7 @@ export class Pivot {
     cellTree: Map<string | null, any> = new Map();
     columnTree: Map<string | null, any> = new Map();
     columnHeaders: Array<Array<Header>> = [];
-    hiddenKey:Map<string|null,null>=new Map();
+    hiddenKey: Map<string | null, null> = new Map();
     onPropertyChanged: Function | null = null;
     constructor(options: PivotOptions) {
         this.options = options;
@@ -34,14 +34,14 @@ export class Pivot {
         this.view = this.filter(this.data, options.filters);
 
         this.rowTree = new Map();
-        this.makeDataMap(this.rowTree, null, null, options.rows, this.view);
+        this.makeHeaderMap(this.rowTree, null, null, options.rows, this.view);
 
         this.columnTree = new Map();
-        this.makeDataMap(this.columnTree, null, null, options.columns, this.view);
+        this.makeHeaderMap(this.columnTree, null, null, options.columns, this.view);
 
         this.cellTree = new Map();
-        this.makeDataMap(this.cellTree, null, null, [...options.rows, ...options.columns], this.view);
-
+        this.makeCellMap(this.cellTree,[...options.rows, ...options.columns],this.view);
+        
         this.rowHeaders = [];
         if (this.options.rows.length > 0)
             this.makeHeaders(this.rowTree as Map<string, any>, [], this.rowHeaders, options.rows);
@@ -59,7 +59,7 @@ export class Pivot {
         this.makeCells();
 
         this.columnHeaders = Arrays.rotate(this.columnHeaders);
-        console.log(this.cellTree, this.cells);
+        console.log(this.rowHeaders);
     }
     load(data: Array<object>) {
 
@@ -85,51 +85,34 @@ export class Pivot {
     }
     private makeCells() {
         let options = this.options;
-        let length = options.rows.length + options.columns.length;
         for (let row of this.rowHeaders) {
             let one: Array<ValueCell> = [];
             for (let col of this.columnHeaders) {
                 for (let value of options.values) {
-                    let step = 0;
                     let temp: Map<string | null | any, any> | Total = this.cellTree;
-                    let cell = new ValueCell(value, 0, '0', true);
-                    let terminated = false;
-                    options.rows.forEach((v, i) => {
-                        let key: any = row[i].value;
-                        cell.rowHeaders.set(v.name, key);
-                        if (!terminated) {
-                            if (temp instanceof Map && temp.has(key)) {
-                                temp = temp.get(key)
-                                step++;
-                            }
-                            else
-                                terminated = true;
+                    let cell = new ValueCell(value, 0, '0');
+
+                    row.forEach(f => {
+                        if (temp instanceof Map && temp.has(f.value)) {
+                            temp = temp.get(f.value)
+                            cell.path.set(f.field?.name, f.value)
                         }
                     });
-                    options.columns.forEach((v, i) => {
-                        let key: any = col[i].value;
-                        cell.columnHeaders.set(v.name, key);
-                        if (!terminated) {
-                            if (temp instanceof Map && temp.has(key)) {
-                                temp = temp.get(key);
-                                step++;
-                            }
-                            else
-                                terminated = true;
+                    col.forEach(f => {
+                        if (temp instanceof Map && temp.has(f.value)) {
+                            temp = temp.get(f.value)
+                            cell.path.set(f.field?.name, f.value)
                         }
                     });
-                    if (step == length || temp instanceof Total) {
-                        var header: Total | null = null;
-                        if (temp instanceof Total)
-                            header = temp as Total;
-                        else if (temp instanceof Map && temp.has(null))
-                            header = temp.get(null) as Total;
-                        if (header != null) {
-                            cell.data = header.data;
-                            cell.value = header.values.get(value.name) ?? null;
-                            cell.text = value.getText(cell.value);
-                            cell.style = value.getStyle(cell.value);
-                        }
+
+                    var array: Array<any> | null = null;
+                    if (temp instanceof Array)
+                        array = temp as Array<any>;
+                    if (array != null) {
+                        cell.data = array;
+                        cell.value = value.compute(array);
+                        cell.text = value.getText(cell.value);
+                        cell.style = value.getStyle(cell.value);
                     }
                     one.push(cell);
                 }
@@ -183,7 +166,36 @@ export class Pivot {
         return result;
     }
 
-    private makeDataMap(root: Map<string | null, any>, parentField: string | null, parentValue: string | null, fields: Array<Field>, array: Array<any>) {
+    private makeCellMap(root: Map<string | null, any>, fields: Array<Field>, array: Array<any>) {
+
+        if (fields.length == 0) {
+            return;
+        }
+
+        let field = fields[0];
+        root.set(null, new Map());            
+        if (fields.length == 1)
+            root.set(null, array);
+        else {
+            root.set(null, new Map());
+            this.makeCellMap(root.get(null), fields.filter((_v, _i) => _i > 0), array)
+        }
+
+        array.forEach(f => {
+            let key = field.getText(f[field.name]);
+            if (root.get(key))
+                return;
+
+            if (fields.length == 1)
+                root.set(key, array.filter(s => field.getText(s[field.name]) == key));
+            else {
+                root.set(key, new Map());
+                this.makeCellMap(root.get(key), fields.filter((_v, _i) => _i > 0), array.filter(s => field.getText(s[field.name]) == key))
+            }
+        });
+
+    }
+    private makeHeaderMap(root: Map<string | null, any>, parentField: string | null, parentValue: string | null, fields: Array<Field>, array: Array<any>) {
         let header = new Total(parentField, parentValue, array)
         for (let value of this.options.values) {
             header.values.set(value.name, value.compute(array))
@@ -195,16 +207,17 @@ export class Pivot {
 
         let field = fields[0];
         array.forEach(f => {
-            if (root.get(f[field.name]))
+            let text = field.getText(f[field.name]);
+            if (root.get(text))
                 return;
 
-            root.set(field.getText(f[field.name]), new Map());
+            root.set(text, new Map());
         });
 
         for (let key of root.keys()) {
             if (key == null)
                 continue;
-            this.makeDataMap(root.get(key), field.name, key, fields.filter((_v, _i) => _i > 0), array.filter(f => field.getText(f[field.name]) == key.toString()))
+            this.makeHeaderMap(root.get(key), field.name, key, fields.filter((_v, _i) => _i > 0), array.filter(f => field.getText(f[field.name]) == key.toString()))
         }
     }
 
@@ -241,26 +254,26 @@ export class Pivot {
         if (header.path == null)
             return;
 
+        let path = [...header.path].slice(0, header.path.size - 1);
+        let key = JSON.stringify(Object.fromEntries(path));
         if (header.collapsed)
-            this.hiddenKey = new Map([...this.hiddenKey, ...header.path]);
+            this.hiddenKey.set(key, null);
         else
-            [...header.path.keys()].forEach(f => this.hiddenKey.delete(f))
+            this.hiddenKey.delete(key)
     }
 
-    public isHidden(row: Array<Header>): boolean {
-        if(!row)
+    public isHidden(row: Array<Header> | Array<ValueCell>): boolean {
+        let last = row[row.length - 1];
+        if (last.path == null || last.value == null)
             return false;
-        for (let header of row) {
-            let key = header.field ?? null;
-            if (key == null) {
-                if (!this.hiddenKey.has(key) || this.hiddenKey.get(key) != header.value)
-                    return false;
-            }
-            else {
-                if (!this.hiddenKey.has(key?.name) || this.hiddenKey.get(key?.name) != header.value)
-                    return false;
-            }
+        let path = [...last.path].slice(0, last.path.size - 1);
+        let key = JSON.stringify(Object.fromEntries(path));
+
+        if (this.hiddenKey.has(key)) {
+            if (this.onPropertyChanged != null)
+                this.onPropertyChanged(false);
+            return true;
         }
-        return true;
+        return false;
     }
 }

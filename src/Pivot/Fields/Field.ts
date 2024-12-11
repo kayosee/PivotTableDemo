@@ -17,13 +17,11 @@ export class Field {
             return this.style(value);
         return this.style ?? '';
     }
-    getText(value: any): string {
+    getText(value: any): string | null {
         if (value == null)
-            return '';
+            return null;
 
         const NA: string = 'N/A';
-        if (value == null)
-            return '';
 
         switch (this.format) {
             case ValueFormat.auto:
