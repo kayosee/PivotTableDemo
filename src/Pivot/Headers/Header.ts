@@ -8,7 +8,9 @@ export class Header {
     style: string;
     collapseable: boolean;
     collapsed: boolean;
-    constructor(path: Map<string | null, any> | null, field: Field | null, value: string | number | Date | null, index: number | null, collapseable: boolean, collapsed: boolean, style: string) {
+    rowspan: number;
+    colspan: number;
+    constructor(path: Map<string | null, any> | null, field: Field | null, value: string | number | Date | null, index: number | null, collapseable: boolean, collapsed: boolean, style: string, rowspan: number, colspan: number) {
         this.path = path;
         this.field = field;
         this.value = value;
@@ -16,5 +18,7 @@ export class Header {
         this.collapseable = collapseable;
         this.collapsed = collapsed;
         this.style = style;
+        this.rowspan = rowspan;
+        this.colspan = colspan;
     }
 }

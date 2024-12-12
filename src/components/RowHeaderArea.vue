@@ -24,11 +24,11 @@ export default {
                 return 0;
             return this.pivot.options.rows.length - index;
         },
-        firstNull:function(row:Array<Header>){
-            let last=row.findIndex(f=>f.value==null);
-            if(last==-1)
+        firstNull: function (row: Array<Header>) {
+            let last = row.findIndex(f => f.value == null);
+            if (last == -1)
                 return row;
-            return row.slice(0,last+1);
+            return row.slice(0, last + 1);
         }
     }
 }

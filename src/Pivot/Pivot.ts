@@ -24,7 +24,7 @@ export class Pivot {
     cellTree: Map<string | null, any> = new Map();
     columnTree: Map<string | null, any> = new Map();
     columnHeaders: Array<Array<Header>> = [];
-    hiddenKey: Map<string | null, null> = new Map();
+    hiddenKey: Map<string, Map<string | null, any>> = new Map();
     onPropertyChanged: Function | null = null;
     constructor(options: PivotOptions) {
         this.options = options;
@@ -40,19 +40,19 @@ export class Pivot {
         this.makeHeaderMap(this.columnTree, null, null, options.columns, this.view);
 
         this.cellTree = new Map();
-        this.makeCellMap(this.cellTree,[...options.rows, ...options.columns],this.view);
-        
+        this.makeCellMap(this.cellTree, [...options.rows, ...options.columns], this.view);
+
         this.rowHeaders = [];
         if (this.options.rows.length > 0)
             this.makeHeaders(this.rowTree as Map<string, any>, [], this.rowHeaders, options.rows);
         else
-            this.rowHeaders = [[new Header(null, null, null, 0, true, false, "")]];
+            this.rowHeaders = [[new Header(null, null, null, 0, true, false, "", 1, 1)]];
 
         this.columnHeaders = [];
         if (this.options.columns.length > 0)
             this.makeHeaders(this.columnTree as Map<string, any>, [], this.columnHeaders, options.columns);
         else
-            this.columnHeaders = [[new Header(null, null, null, 0, true, false, "")]];
+            this.columnHeaders = [[new Header(null, null, null, 0, true, false, "", 1, 1)]];
 
         this.sort();
         this.cells = [];
@@ -95,13 +95,13 @@ export class Pivot {
                     row.forEach(f => {
                         if (temp instanceof Map && temp.has(f.value)) {
                             temp = temp.get(f.value)
-                            cell.path.set(f.field?.name, f.value)
+                            cell.path.set(f.field ? f.field.name : null, f.value ? f.value.toString() : null)
                         }
                     });
                     col.forEach(f => {
                         if (temp instanceof Map && temp.has(f.value)) {
                             temp = temp.get(f.value)
-                            cell.path.set(f.field?.name, f.value)
+                            cell.path.set(f.field ? f.field.name : null, f.value ? f.value.toString() : null)
                         }
                     });
 
@@ -173,7 +173,7 @@ export class Pivot {
         }
 
         let field = fields[0];
-        root.set(null, new Map());            
+        root.set(null, new Map());
         if (fields.length == 1)
             root.set(null, array);
         else {
@@ -228,7 +228,7 @@ export class Pivot {
                 result.push(array.map((v1, i1) => {
                     let path: Map<string | null, any> = new Map();
                     array.slice(0, i1 + 1).map((v2, i2) => path.set(fields[i2] ? fields[i2].name : null, v2));
-                    return new Header(path, fields[i1], v1, i1, v1 === null, false, "");
+                    return new Header(path, fields[i1], v1, i1, v1 === null, false, "", 1, 1);
                 }
                 ));
             }
@@ -254,10 +254,10 @@ export class Pivot {
         if (header.path == null)
             return;
 
-        let path = [...header.path].slice(0, header.path.size - 1);
+        let path = [...header.path];
         let key = JSON.stringify(Object.fromEntries(path));
         if (header.collapsed)
-            this.hiddenKey.set(key, null);
+            this.hiddenKey.set(key, new Map(path));
         else
             this.hiddenKey.delete(key)
     }
@@ -266,10 +266,23 @@ export class Pivot {
         let last = row[row.length - 1];
         if (last.path == null || last.value == null)
             return false;
-        let path = [...last.path].slice(0, last.path.size - 1);
+
+        let path = [...last.path];
         let key = JSON.stringify(Object.fromEntries(path));
 
         if (this.hiddenKey.has(key)) {
+            if (last instanceof ValueCell)
+                debugger;
+            let map: Map<string | null, any> = this.hiddenKey.get(key);
+            for (let i of map.keys()) {
+                if (!last.path.has(i))
+                    return false;
+                let value1 = last.path.get(i);
+                let value2 = map.get(i);
+                if ((value2 == null && value1 == value2) || (value2 != null && value1 != value2))
+                    return false;
+            }
+
             if (this.onPropertyChanged != null)
                 this.onPropertyChanged(false);
             return true;

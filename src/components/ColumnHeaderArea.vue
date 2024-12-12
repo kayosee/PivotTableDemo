@@ -5,28 +5,59 @@ import { Pivot } from "../Pivot/Pivot";
 export default {
     name: "ColumnHeaderArea",
     props: {
-        pivot:{
-            type:Pivot,
-            default:{}
+        pivot: {
+            type: Pivot,
+            default: {}
         }
     },
     methods: {
         collapse: function (header: Header) {
             this.pivot.collapseHeader(header);
         },
-        getColspan: function (header: Header, index: number) {
-            if (header.value !== null)
-                return 0;
-            return this.pivot.options.rows.length - index;
+        fistNull: function (column: number) {
+            for (let i = 0; i < this.pivot.columnHeaders.length; i++) {
+                if (this.pivot.columnHeaders[i][column].value === null)
+                    return i;
+            }
+            return null;
         },
-        firstNull:function(row:Array<Header>,index:number){
-            for(var i=0;i<this.pivot.collapseHeader.length-1;i++)
-                if(this.pivot.collapseHeader[i][index].value==null)
-                    break;
+        lastNull: function (column: number) {
+            let j = this.fistNull(column);
+            if (j == null)
+                return null;
+            for (var i = j; i < this.pivot.columnHeaders.length; i++) {
+                if (this.pivot.columnHeaders[i][column].value !== null)
+                    return i;
+            }
+            return i - 1;
 
-            if(i==-1)
-                return row;
-            return row.slice(0,i+1);
+        },
+        trim: function (row: Array<Header>, i: number) {
+            let size = row.length;
+            for (let k = 0; k < size; k++) {
+                if (this.fistNull(k) == i)
+                    row[k].rowspan = this.getRowspan(k);
+                else
+                    row[k].rowspan = 1
+            }
+
+            let result = [];
+            for (let j = 0; j < size; j++) {
+
+                let first = this.fistNull(j);
+                if (row[j].value == null && first != null && first < i)
+                    continue;
+
+                result.push(row[j])
+            }
+            return result;
+        },
+        getRowspan: function (column: number) {
+            let first = this.fistNull(column);
+            let last = this.lastNull(column);
+            if (first == null || last == null)
+                return 1;
+            return (last - first) + 1;
         },
         getAggregators(): Array<any> {
             let headers = this.pivot.columnHeaders;
@@ -53,10 +84,10 @@ export default {
 <template>
 
     <table class="pivot-frame">
-        <tr class="row" v-for="(row,i) in pivot.columnHeaders">
-            <td :colspan="pivot.options.values.length" class="pivot-cell" v-for="(header,j) in row"  :rowspan="getColspan(header, j)">
-                <span v-if="header.value!==null">{{ header.value }}</span>
-                <span v-if="header.value===null">合计</span>
+        <tr class="row" v-for="(row, i) in pivot.columnHeaders">
+            <td class="pivot-cell" v-for="(header, j) in trim(row, i)" :rowspan="header.rowspan">
+                <span v-if="header.value !== null">{{ header.value }}</span>
+                <span v-if="header.value === null">合计</span>
             </td>
             <td><span class="placeholder"></span></td>
         </tr>
