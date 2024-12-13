@@ -36,9 +36,8 @@ export default {
 
 <template>
     <table class="pivot-frame">
-        <tr class="row" v-for="row in pivot.rowHeaders"
-            :style="{ display: pivot.isHidden(row) ? 'none' : 'table-row' }">
-            <td class="pivot-cell" v-for="(header, j) in firstNull(row)" :colspan="getColspan(header, j)">
+        <tr class="row" v-for="row in pivot.rowHeaders">
+            <td class="pivot-cell" v-for="(header, j) in firstNull(row)" :colspan="getColspan(header, j)" :class="{'hidden':header.hidden}">
                 <div v-if="header.value !== null">{{ header.value }}</div>
                 <div v-if="header.value === null" v-on:click="collapse(header)">合计</div>
             </td>
@@ -47,6 +46,9 @@ export default {
 
 </template>
 <style scoped>
+.hidden{
+    display: none;
+}
 .pivot-cell {
     white-space: nowrap;
 }

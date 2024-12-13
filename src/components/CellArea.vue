@@ -24,8 +24,8 @@ export default {
 <template>
     <DrillDownDialog ref="drillDownDialog"></DrillDownDialog>
     <table class="pivot-frame">
-        <tr class="row" v-for="row in pivot.cells" :class="pivot.isHidden(row) ? 'hidden' : ''">
-            <td v-on:click="drillDown(cell)" class="pivot-cell"
+        <tr class="row" v-for="row in pivot.cells">
+            <td v-on:click="drillDown(cell)" class="pivot-cell" :class="{'hidden':cell.hidden}"
                 :style="cell.style" v-for="cell in row">{{ cell.text }}</td>
         </tr>
     </table>

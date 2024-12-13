@@ -7,9 +7,11 @@ export class ValueCell {
     style: string | null = null;
     data: Array<any> = [];
     path: Map<string | null, string | null> = new Map();
-    constructor(valueField: ValueField, value: number, text: string) {
+    hidden:boolean;
+    constructor(valueField: ValueField, value: number, text: string,hidden:boolean) {
         this.valueField = valueField;
         this.value = value;
         this.text = text;
+        this.hidden = hidden;
     }
 }
