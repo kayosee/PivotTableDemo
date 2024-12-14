@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Header } from "../Pivot/Headers/Header";
 import { Pivot } from "../Pivot/Pivot";
+import { Arrays } from "../Pivot/Utils/Arrays";
 
 export default {
     name: "ColumnHeaderArea",
@@ -35,7 +36,7 @@ export default {
         trim: function (row: Array<Header>, i: number) {
             let size = row.length;
             for (let k = 0; k < size; k++) {
-                if (this.fistNull(k) == i)
+                if (Arrays.firstNull(this.pivot.columnHeaders,(f: Header[])=>f[k].value) == i)
                     row[k].rowspan = this.getRowspan(k);
                 else
                     row[k].rowspan = 1
@@ -43,8 +44,7 @@ export default {
 
             let result = [];
             for (let j = 0; j < size; j++) {
-
-                let first = this.fistNull(j);
+                let first = Arrays.firstNull(this.pivot.columnHeaders,(f:Header[])=>f[j].value);
                 if (row[j].value == null && first != null && first < i)
                     continue;
 
@@ -53,8 +53,8 @@ export default {
             return result;
         },
         getRowspan: function (column: number) {
-            let first = this.fistNull(column);
-            let last = this.lastNull(column);
+            let first = Arrays.firstNull(this.pivot.columnHeaders,(f: Header[])=>f[column].value);
+            let last = Arrays.lastNull(this.pivot.columnHeaders,(f: Header[])=>f[column].value);
             if (first == null || last == null)
                 return 1;
             return (last - first) + 1;

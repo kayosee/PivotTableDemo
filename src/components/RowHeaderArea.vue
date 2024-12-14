@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Header } from '../Pivot/Headers/Header';
 import { Pivot } from '../Pivot/Pivot';
+import { Arrays } from '../Pivot/Utils/Arrays';
 
 
 export default {
@@ -21,14 +22,15 @@ export default {
         },
         getColspan: function (header: Header, index: number) {
             if (header.value !== null)
-                return 0;
+                return 1;
             return this.pivot.options.rows.length - index;
         },
-        firstNull: function (row: Array<Header>) {
-            let last = row.findIndex(f => f.value == null);
-            if (last == -1)
+        trim: function (row: Array<Header>) {
+            let first = Arrays.firstNull(row, (f: Header) => f.value);
+            let last = Arrays.lastNull(row, (f: Header) => f.value);
+            if (first == null || last != row.length - 1)
                 return row;
-            return row.slice(0, last + 1);
+            return row.slice(0, first + 1);
         }
     }
 }
@@ -36,10 +38,10 @@ export default {
 
 <template>
     <table class="pivot-frame">
-        <tr class="row" v-for="row in pivot.rowHeaders">
-            <td class="pivot-cell" v-for="(header, j) in firstNull(row)" :colspan="getColspan(header, j)" :class="{'hidden':header.hidden}">
+        <tr class="row" v-for="(row,i) in pivot.rowHeaders">
+            <td class="pivot-cell" v-for="(header, j) in trim(row)" :colspan="getColspan(header,j)" :class="{'hidden':header.hidden}">
                 <div v-if="header.value !== null">{{ header.value }}</div>
-                <div v-if="header.value === null" v-on:click="collapse(header)">合计</div>
+                <div v-if="header.value === null&&header.collapseable" v-on:click="collapse(header)">合计</div>
             </td>
         </tr>
     </table>

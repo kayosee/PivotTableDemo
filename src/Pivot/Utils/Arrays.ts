@@ -1,4 +1,4 @@
-export class Arrays{
+export class Arrays {
     static distinct(data: Array<any>, prop: string): Array<any> {
         return data.map(f => f[prop]).filter((value, index, array) => array.indexOf(value) == index);
     }
@@ -46,5 +46,32 @@ export class Arrays{
             temp.push(row);
         }
         return temp;
+    }
+    static firstNull(array: Array<any>, getter: Function): null | number {
+        for (let i = 0; i < array.length; i++) {
+            if (getter(array[i]) === null)
+                return i;
+        }
+        return null;
+    }
+    static lastNull(array: Array<any>, getter: Function): null | number {
+        let j = Arrays.firstNull(array, getter);
+        if (j == null)
+            return null;
+
+        let i = j;
+        let k = j;
+        while (i < array.length && getter(array[i]) == null) {
+            k = i;
+            i++;
+        }
+        return k;
+    }
+    static getSpan(array: Array<any>, getter: Function) {
+        let first = Arrays.firstNull(array, getter);
+        let last = Arrays.lastNull(array, getter);
+        if (first == null || last == null)
+            return 1;
+        return (last - first) + 1;
     }
 }
