@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Header } from '../Pivot/Headers/Header';
+import { HeaderCell } from '../Pivot/Cells/HeaderCell';
 import { Pivot } from '../Pivot/Pivot';
 import { Arrays } from '../Pivot/Utils/Arrays';
 
@@ -12,22 +12,22 @@ export default {
             default: {}
         },
         headers: {
-            type: Array<Array<Header>>,
+            type: Array<Array<HeaderCell>>,
             default: []
         }
     },
     methods: {
-        collapse: function (header: Header) {
+        collapse: function (header: HeaderCell) {
             this.pivot.collapseHeader(header);
         },
-        getColspan: function (header: Header, index: number) {
+        getColspan: function (header: HeaderCell, index: number) {
             if (header.value !== null)
                 return 1;
             return this.pivot.options.rows.length - index;
         },
-        trim: function (row: Array<Header>) {
-            let first = Arrays.firstNull(row, (f: Header) => f.value);
-            let last = Arrays.lastNull(row, (f: Header) => f.value);
+        trim: function (row: Array<HeaderCell>) {
+            let first = Arrays.firstNull(row, (f: HeaderCell) => f.value);
+            let last = Arrays.lastNull(row, (f: HeaderCell) => f.value);
             if (first == null || last != row.length - 1)
                 return row;
             return row.slice(0, first + 1);

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Header } from "../Pivot/Headers/Header";
+import { HeaderCell } from "../Pivot/Cells/HeaderCell";
 import { Pivot } from "../Pivot/Pivot";
 import { Arrays } from "../Pivot/Utils/Arrays";
 
@@ -12,31 +12,13 @@ export default {
         }
     },
     methods: {
-        collapse: function (header: Header) {
+        collapse: function (header: HeaderCell) {
             this.pivot.collapseHeader(header);
         },
-        fistNull: function (column: number) {
-            for (let i = 0; i < this.pivot.columnHeaders.length; i++) {
-                if (this.pivot.columnHeaders[i][column].value === null)
-                    return i;
-            }
-            return null;
-        },
-        lastNull: function (column: number) {
-            let j = this.fistNull(column);
-            if (j == null)
-                return null;
-            for (var i = j; i < this.pivot.columnHeaders.length; i++) {
-                if (this.pivot.columnHeaders[i][column].value !== null)
-                    return i;
-            }
-            return i - 1;
-
-        },
-        trim: function (row: Array<Header>, i: number) {
+        trim: function (row: Array<HeaderCell>, i: number) {
             let size = row.length;
             for (let k = 0; k < size; k++) {
-                if (Arrays.firstNull(this.pivot.columnHeaders,(f: Header[])=>f[k].value) == i)
+                if (Arrays.firstNull(this.pivot.columnHeaders,(f: HeaderCell[])=>f[k].value) == i)
                     row[k].rowspan = this.getRowspan(k);
                 else
                     row[k].rowspan = 1
@@ -44,7 +26,7 @@ export default {
 
             let result = [];
             for (let j = 0; j < size; j++) {
-                let first = Arrays.firstNull(this.pivot.columnHeaders,(f:Header[])=>f[j].value);
+                let first = Arrays.firstNull(this.pivot.columnHeaders,(f:HeaderCell[])=>f[j].value);
                 if (row[j].value == null && first != null && first < i)
                     continue;
 
@@ -53,8 +35,8 @@ export default {
             return result;
         },
         getRowspan: function (column: number) {
-            let first = Arrays.firstNull(this.pivot.columnHeaders,(f: Header[])=>f[column].value);
-            let last = Arrays.lastNull(this.pivot.columnHeaders,(f: Header[])=>f[column].value);
+            let first = Arrays.firstNull(this.pivot.columnHeaders,(f: HeaderCell[])=>f[column].value);
+            let last = Arrays.lastNull(this.pivot.columnHeaders,(f: HeaderCell[])=>f[column].value);
             if (first == null || last == null)
                 return 1;
             return (last - first) + 1;

@@ -10,19 +10,20 @@ import { Arrays } from "./Utils/Arrays";
 import { Sort } from "./Utils/Sort";
 import { SortOrder } from "./Enums/SortOrder";
 import { Area } from "./Enums/Area";
-import { Header } from "./Headers/Header";
+import { Cell } from "./Cells/Cell";
+import { HeaderCell } from "./Cells/HeaderCell";
 
 
 export class Pivot {
     options: PivotOptions;
     data: Array<any> = [];
     view: Array<any> = [];
-    cells: Array<Array<ValueCell>> = [];
-    rowHeaders: Array<Array<Header>> = [];
+    cells: Array<Array<Cell>> = [];
+    rowHeaders: Array<Array<HeaderCell>> = [];
     rowTree: Map<string | null, any> = new Map();
     cellTree: Map<string | null, any> = new Map();
     columnTree: Map<string | null, any> = new Map();
-    columnHeaders: Array<Array<Header>> = [];
+    columnHeaders: Array<Array<HeaderCell>> = [];
     hiddenRows: Array<string> = [];
     hiddenColumns: Array<string> = [];
     onPropertyChanged: Function | null = null;
@@ -34,13 +35,13 @@ export class Pivot {
         this.view = this.filter(this.data, options.filters);
 
         this.rowTree = new Map();
-        this.makeCellMap(this.rowTree, options.rows, new Map(), this.view);
+        this.makeCellMap(this.rowTree, options.rows, new Map(), this.view, this.makeHeaderCell);
 
         this.columnTree = new Map();
-        this.makeCellMap(this.columnTree, options.columns, new Map(), this.view);
+        this.makeCellMap(this.columnTree, options.columns, new Map(), this.view, this.makeHeaderCell);
 
         this.cellTree = new Map();
-        this.makeCellMap(this.cellTree, [...options.rows, ...options.columns], new Map(), this.view);
+        this.makeCellMap(this.cellTree, [...options.rows, ...options.columns], new Map(), this.view, this.makeValueCell);
 
         this.rowHeaders = [];
         if (this.options.rows.length > 0) {
@@ -48,7 +49,7 @@ export class Pivot {
             this.makeHeaders(this.rowTree as Map<string, any>, new Map(), new Map(), this.rowHeaders, options.rows);
         }
         else
-            this.rowHeaders = [[new Header(null, null, null, 0, true, false, "", 1, 1, false)]];
+            this.rowHeaders = [[new HeaderCell(null, '', null, 0,)]];
 
         this.columnHeaders = [];
         if (this.options.columns.length > 0) {
@@ -56,7 +57,7 @@ export class Pivot {
             this.makeHeaders(this.columnTree as Map<string, any>, new Map(), new Map(), this.columnHeaders, options.columns);
         }
         else
-            this.columnHeaders = [[new Header(null, null, null, 0, true, false, "", 1, 1, false)]];
+            this.columnHeaders = [[new HeaderCell(null, '', null, 0,)]];
 
         this.sort();
         this.makeCells();
@@ -72,7 +73,7 @@ export class Pivot {
         for (let i = 0; i < this.options.columns.length; i++) {
             if (this.options.columns[i].sort == SortOrder.none)
                 continue;
-            sort.orderBy(((f: Array<Header>) => f[i].value), this.options.columns[i].type, this.options.columns[i].sort == SortOrder.desc);
+            sort.orderBy(((f: Array<HeaderCell>) => f[i].value), this.options.columns[i].type, this.options.columns[i].sort == SortOrder.desc);
         }
         sort.do();
 
@@ -81,7 +82,7 @@ export class Pivot {
             if (this.options.rows[i].sort == SortOrder.none)
                 continue;
 
-            sort.orderBy(((f: Array<Header>) => f[i].value), this.options.rows[i].type, this.options.rows[i].sort == SortOrder.desc);
+            sort.orderBy(((f: Array<HeaderCell>) => f[i].value), this.options.rows[i].type, this.options.rows[i].sort == SortOrder.desc);
         } sort.do();
     }
 
@@ -89,8 +90,12 @@ export class Pivot {
         this.cells = [];
         for (let row of this.rowHeaders) {
             let path: Map<string | null, any> = new Map();
+            let root = this.rowTree;
             let part1: Map<string | null, any> | ValueCell = this.cellTree;
             row.forEach(f => {
+                if (root.has(f.value))
+                    root = root.get(f.value);
+
                 if (f.field == null)
                     return;
                 if (part1 instanceof Map) {
@@ -100,10 +105,18 @@ export class Pivot {
                 }
                 path.set(f.field?.name, f.value);
             });
+            if (root instanceof HeaderCell) {
+                let node = (root as HeaderCell);
+                node.parents = row.filter(f => f.field?.name != node.field?.name);
+                debugger;
+            }
             let one: Array<ValueCell> = [];
             for (let col of this.columnHeaders) {
+                root = this.columnTree;
                 let part2: Map<string | null, any> | ValueCell = part1;
                 col.forEach(f => {
+                    if (root.has(f.value))
+                        root = root.get(f.value);
                     if (f.field == null)
                         return;
                     if (part2 instanceof Map) {
@@ -113,10 +126,14 @@ export class Pivot {
                     }
                     path.set(f.field?.name, f.value);
                 });
-
+                if (root instanceof HeaderCell) {
+                    let node = (root as HeaderCell);
+                    node.parents = col.filter(f => f.field?.name != node.field?.name);
+                    debugger;
+                }
                 for (let value of this.options.values) {
                     if (!part2.has(value.name)) {
-                        let nullCell = new ValueCell(value, 0, '0', false);
+                        let nullCell = new ValueCell(value, 0, '0');
                         nullCell.path = path;
                         part2.set(value.name, nullCell)
                         one.push(nullCell);
@@ -174,10 +191,10 @@ export class Pivot {
         return result;
     }
 
-    private makeValueCell(path: Map<string | null, string | null>, data: Array<any>): Map<string, ValueCell> {
+    private makeValueCell(_field: Field, _value: string | number | Date | null, path: Map<string | null, string | null>, data: Array<any>): Map<string, ValueCell> {
         let result: Map<string, ValueCell> = new Map();
         for (let value of this.options.values) {
-            let cell = new ValueCell(value, 0, "", false);
+            let cell = new ValueCell(value, 0, "");
             cell.data = data;
             cell.path = path;
             cell.value = value.compute(data);
@@ -188,7 +205,13 @@ export class Pivot {
         return result;
     }
 
-    private makeCellMap(root: Map<string | null, any>, fields: Array<Field>, path: Map<string | null, string | null>, array: Array<any>) {
+    private makeHeaderCell(field: Field, value: string | number | Date | null, path: Map<string | null, string | null>, _data: Array<any>): HeaderCell {
+        let cell = new HeaderCell(value, value ? value.toString() : '', field, path.size);
+        cell.path = path;
+        return cell;
+    }
+
+    private makeCellMap(root: Map<string | null, any>, fields: Array<Field>, path: Map<string | null, string | null>, array: Array<any>, setter: Function) {
         if (fields.length == 0) {
             return;
         }
@@ -196,10 +219,10 @@ export class Pivot {
         let field = fields[0];
         root.set(null, new Map());
         if (fields.length == 1)
-            root.set(null, this.makeValueCell(new Map(path).set(field.name, null), array));
+            root.set(null, setter.call(this, field, null, new Map(path).set(field.name, null), array));
         else {
             root.set(null, new Map());
-            this.makeCellMap(root.get(null), fields.filter((_v, _i) => _i > 0), new Map(path).set(field.name, null), array)
+            this.makeCellMap(root.get(null), fields.filter((_v, _i) => _i > 0), new Map(path).set(field.name, null), array, setter)
         }
 
         array.forEach(f => {
@@ -208,25 +231,32 @@ export class Pivot {
                 return;
 
             if (fields.length == 1)
-                root.set(key, this.makeValueCell(new Map(path).set(field.name, key), array.filter(s => field.getText(s[field.name]) == key)));
+                root.set(key, setter.call(this, field, key, new Map(path).set(field.name, key), array.filter(s => field.getText(s[field.name]) == key)));
             else {
                 root.set(key, new Map());
-                this.makeCellMap(root.get(key), fields.filter((_v, _i) => _i > 0), new Map(path).set(field.name, key), array.filter(s => field.getText(s[field.name]) == key))
+                this.makeCellMap(root.get(key), fields.filter((_v, _i) => _i > 0), new Map(path).set(field.name, key), array.filter(s => field.getText(s[field.name]) == key), setter)
             }
         });
     }
 
-    private makeHeaders(data: Map<string, any>, path: Map<string | null, any>, temp: Map<string, Header>, result: Array<Array<Header>>, fields: Array<Field>): any {
+    private makeHeaders(data: Map<string, any>, path: Map<string | null, any>, temp: Map<string, HeaderCell>, result: Array<Array<HeaderCell>>, fields: Array<Field>): any {
         if (fields.length == 0) {
-            let array = [...path.values()];
-            let exists=array.reduce((prev, cur, index) => prev || (index > 0 && array[index - 1] === null && cur === null), false);
-            if (array.every(f => f == null) || !exists)//不要中间NULL
+            let array = [...path.values()].map(f => f ? '1' : '0').join(',');
+            if (/^(1.?)*(0.?)*$/.test(array))//不要中间NULL或者中间非NULL
                 result.push(Array.from(temp.values()));
         } else {
             for (let i of data) {
                 let key = fields[0].name;
                 let value: string = i[0];
-                temp.set(fields[0].name, (new Header(new Map(path).set(key, value), fields[0], value, 0, value == null, false, "", 0, 0, false)));
+                let cell: HeaderCell;
+                if (i[1] instanceof HeaderCell)
+                    cell = i[1] as HeaderCell;
+                else {
+                    cell = new HeaderCell(value, value, fields[0], path.size);
+                    cell.path = new Map(path).set(key, value);
+                }
+                cell.collapseable = value == null;
+                temp.set(fields[0].name, cell);
                 this.makeHeaders((i[1] as Map<string, any>), new Map(path).set(key, value), temp, result, fields.filter((_, i) => i > 0));
             }
         }
@@ -243,62 +273,66 @@ export class Pivot {
         return result;
     }
 
-    /*
-    public collapseColumn(header: Header) {
+    public collapseColumn(header: HeaderCell, area: Area) {
+        let array: Array<string>;
+        if (area == Area.column)
+            array = this.hiddenColumns;
+        else if (area == Area.row)
+            array = this.hiddenRows;
+        else
+            return;
+
         header.collapsed = !header.collapsed;
         if (header.path == null)
             return;
 
-        let path = [...header.path];
+        let path = [...header.path].slice(0, -1);
         let key = JSON.stringify(Object.fromEntries(path)).replace(/[{}]/g, '');
         if (!header.collapsed) {
-            let index = this.hiddenColumns.findIndex(f => f == key);
+            let index = array.findIndex(f => f == key);
             if (index > -1)
-                this.hiddenColumns.splice(index, 1);
+                array.splice(index, 1);
         }
         else
-            this.hiddenRows.push(key)
+            array.push(key)
 
-
-        this.hideCells();
-        this.hideHeaders();
+        this.hideCells(new Map(path), header.collapseable);
+        this.hideHeaders(new Map(path), area, header.collapsed);
         if (this.onPropertyChanged)
             this.onPropertyChanged(false);
     }
-    public collapseRow(header: Header) {
-        header.collapsed = !header.collapsed;
-        if (header.path == null)
+
+    public hideCells(path: Map<string | null, any>, hidden: boolean) {
+        let temp = this.cellTree;
+        for (let i of path) {
+            if (temp.has(i[0]))
+                temp = temp.get(i[0])
+        }
+        this.doHide(temp, hidden);
+    }
+    public doHide(tree: Map<string | null, any>, hidden: boolean) {
+        for (let i of tree) {
+            if (i[1] instanceof Map)
+                this.doHide(i[1], hidden);
+            else if (i[1] instanceof ValueCell)
+                i[1].hidden = hidden;
+        }
+    }
+    public hideHeaders(path: Map<string | null, any>, area: Area, hidden: boolean) {
+        let array: Array<Array<HeaderCell>>;
+        if (area == Area.column)
+            array = this.columnHeaders;
+        else if (area == Area.row)
+            array = this.rowHeaders;
+        else
             return;
 
-        let path = [...header.path];
-        let key = JSON.stringify(Object.fromEntries(path)).replace(/[{}]/g, '');
-        if (!header.collapsed) {
-            let index = this.hiddenRows.findIndex(f => f == key);
-            if (index > -1)
-                this.hiddenRows.splice(index, 1);
-        }
-        else
-            this.hiddenRows.push(key)
-
-
-        this.hideCells();
-        this.hideHeaders();
-        if (this.onPropertyChanged)
-            this.onPropertyChanged(false);
-    }
-
-    public hideCells() {
-        for (let row of this.cells) {
-            for (let cell of row)
-                cell.hidden = this.isHidden(cell);
-        }
-    }
-    public hideHeaders() {
-        for (let header of this.rowHeaders)
+        for (let header of array)
             if (header.find(f => this.isHidden(f)))
                 header.forEach(f => f.hidden = true);
+
     }
-    public isHidden(cell: ValueCell | Header): boolean {
+    public isHidden(cell: ValueCell | HeaderCell): boolean {
         if (cell.path == null)
             return false;
 
@@ -308,5 +342,5 @@ export class Pivot {
             return false;
         return this.hiddenKey.findIndex(f => key.indexOf(f) != -1) >= 0;
     }
-        */
+
 }
