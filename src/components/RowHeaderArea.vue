@@ -1,5 +1,6 @@
 <script lang="ts">
 import { HeaderCell } from '../Pivot/Cells/HeaderCell';
+import { Area } from '../Pivot/Enums/Area';
 import { Pivot } from '../Pivot/Pivot';
 import { Arrays } from '../Pivot/Utils/Arrays';
 
@@ -18,7 +19,7 @@ export default {
     },
     methods: {
         collapse: function (header: HeaderCell) {
-            this.pivot.collapseHeader(header);
+            this.pivot.collapse(header,Area.row);
         },
         getColspan: function (header: HeaderCell, index: number) {
             if (header.value !== null)

@@ -6,8 +6,8 @@ export class ValueCell extends Cell {
     value: number | null;
     style: string | null = null;
     data: Array<any> = [];
-    constructor(valueField: ValueField, value: number, text: string) {
-        super(value, text);
+    constructor(value: number, text: string, path: Map<string | null, string | null> | null, valueField: ValueField) {
+        super(value, text, path);
         this.valueField = valueField;
         this.value = value;
     }

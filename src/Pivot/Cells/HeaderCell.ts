@@ -3,20 +3,20 @@ import { Field } from "../Fields/Field";
 
 export class HeaderCell extends Cell {
     field: Field | null;
-    index: number | null;
+    index: number;
     collapseable: boolean;
     collapsed: boolean;
     rowspan: number;
     colspan: number;
-    parents: HeaderCell[] | null;
-    constructor(value: string | number | Date | null, text: string, field: Field | null, index: number) {
-        super(value, text);
+    peers: HeaderCell[] | null;
+    constructor(value: string | number | Date | null, text: string | null, path: Map<string | null, string | null> | null, field: Field | null, index: number, collapseable:boolean) {
+        super(value, text, path);
         this.field = field;
         this.index = index;
-        this.collapseable = false;
+        this.collapseable = collapseable;
         this.collapsed = false;
         this.rowspan = 1;
         this.colspan = 1;
-        this.parents = null;
+        this.peers = null;
     }
 }
