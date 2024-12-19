@@ -1,5 +1,6 @@
 <script lang="ts">
 import { HeaderCell } from "../Pivot/Cells/HeaderCell";
+import { Area } from "../Pivot/Enums/Area";
 import { Pivot } from "../Pivot/Pivot";
 import { Arrays } from "../Pivot/Utils/Arrays";
 
@@ -13,7 +14,7 @@ export default {
     },
     methods: {
         collapse: function (header: HeaderCell) {
-            this.pivot.collapseHeader(header);
+            this.pivot.collapse(header,Area.column);
         },
         trim: function (row: Array<HeaderCell>, i: number) {
             let size = row.length;
@@ -69,7 +70,7 @@ export default {
         <tr class="row" v-for="(row, i) in pivot.columnHeaders">
             <td class="pivot-cell" v-for="(header, j) in trim(row, i)" :rowspan="header.rowspan">
                 <span v-if="header.value !== null">{{ header.value }}</span>
-                <span v-if="header.value === null">合计</span>
+                <span v-if="header.value === null && header.collapseable" v-on:click="collapse(header)">合计</span>
             </td>
             <td><span class="placeholder"></span></td>
         </tr>
