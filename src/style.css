@@ -9,6 +9,7 @@
     height:24px;
     border: 1px solid gray;
     text-align: center;
+    padding: 0;
 }
 
 .pivot-frame td, .pivot-frame th {
