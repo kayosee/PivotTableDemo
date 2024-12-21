@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { getCurrentInstance, reactive, ref } from 'vue';
+import { ref } from 'vue';
 import { Pivot } from '../Pivot/Pivot.ts';
 import { PivotOptions } from '../Pivot/PivotOptions';
 import { data } from '../Pivot/data';
@@ -8,8 +8,8 @@ import ColumnHeaderArea from './ColumnHeaderArea.vue';
 import RowHeaderArea from './RowHeaderArea.vue';
 import FieldsPanel from './FieldsPanel.vue';
 var options = new PivotOptions({
-    height:500,
-    width:1200,
+    height: 500,
+    width: 1200,
     showFieldsPanel: 'right',
     fields: [
         { name: 'item_code', title: '代码', type: 'string' },
@@ -30,8 +30,8 @@ var options = new PivotOptions({
 
     ],
     columns: [
-         { field: 'pack', style: {} },
-         { field: 'stall', style: {} },
+        { field: 'pack', style: {} },
+        { field: 'stall', style: {} },
     ],
     rows: [
         { field: 'route', style: {} },
@@ -56,19 +56,11 @@ var options = new PivotOptions({
     ]
 });
 
-var pivot = reactive(new Pivot(options));
-pivot.load(data);
-pivot.onPropertyChanged = function (redraw:boolean) {
-    if(redraw)
-        pivot.calc();
-
-    const instance = getCurrentInstance();
-    instance?.proxy?.$forceUpdate();
-}
-
+var pivot = ref(new Pivot(options));
+pivot.value.load(data);
 let scrollTop = ref(0);
 let scrollLeft = ref(0);
-let rowAreaWidth=ref(0);
+let rowAreaWidth = ref(0);
 let onScroll = function (e: any) {
     if (e.target != null) {
         scrollTop.value = e.target.scrollTop

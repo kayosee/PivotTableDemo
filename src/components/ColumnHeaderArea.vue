@@ -36,8 +36,8 @@ export default {
 
     <table class="pivot-frame">
         <tr>
-            <td class="pivot-cell header-row" v-for="(header) in pivot.columnHeaders" :class="{'hidden':header.hidden}">
-                <div class="pivot-cell header" v-for="(cell, j) in header.trim()"  :class="{'hidden':cell.hidden,'even':j==1}" >
+            <td class="pivot-cell header-row" v-for="(header) in pivot.columnHeaders" :class="{'hidden':header.hidden}" >
+                <div class="pivot-cell header" v-for="(cell, j) in header.trim()"  :class="{'hidden':cell.hidden,'even':j!=0}" v-bind:style="{height:100/header.trim().length+'%'}" >
                     <span v-if="cell.value !== null">{{ cell.value }}</span>
                     <span v-if="cell.value === null" v-on:click="collapse(header)">合计</span>
                 </div>
@@ -61,6 +61,9 @@ export default {
 }
 .header,.value{
     border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .header-row .even{
     border-top: 1px solid;

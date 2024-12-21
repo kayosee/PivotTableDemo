@@ -16,7 +16,10 @@ export default {
     },
     methods: {
         drillDown: function (cell: ValueCell) {
-            this.$refs.drillDownDialog.open(this.pivot.options.fields, cell.data)
+            if (cell.path != null) {
+                let data = this.pivot.getDetails(cell.path);
+                this.$refs.drillDownDialog.open(this.pivot.options.fields, data)
+            }
         }
     }
 }

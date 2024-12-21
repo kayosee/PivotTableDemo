@@ -179,7 +179,7 @@ export class Pivot {
         let result: Map<string, ValueCell> = new Map();
         for (let value of this.options.values) {
             let cell = new ValueCell(0, "", path, value);
-            cell.data = data;
+            //cell.data = data;
             cell.value = value.compute(data);
             cell.text = value.getText(cell.value);
             cell.style = value.getStyle(cell.value);
@@ -273,7 +273,7 @@ export class Pivot {
         if (header.path == null)
             return;
 
-        let path = [...header.path].slice(0, -1);
+        let path = [...header.path].filter(f=>f[1]!=null);
         let key = JSON.stringify(Object.fromEntries(path)).replace(/[{}]/g, '');
         if (!header.collapsed) {
             let index = array.findIndex(f => f == key);
@@ -311,5 +311,14 @@ export class Pivot {
                 i[1].parent.valueCells.forEach(f => f.hidden = hidden);
             }
         }
+    }
+    public getDetails(path: Map<string | null, string | null>): Array<any> {
+        let details = this.data;
+        for (let i of path) {
+            if (i[0] != null && i[1] != null) {
+                details = details.filter(f => f[i[0]] == i[1]);
+            }
+        }
+        return details;
     }
 }
