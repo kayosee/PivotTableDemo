@@ -46,7 +46,6 @@ export class Pivot {
 
         this.rowHeaders = [];
         if (this.options.rows.length > 0) {
-            //this.rowHeaders = [options.rows.map(_ => new Header(null, null, null, 0, true, false, "", 1, 1, false))]
             this.makeHeaders(this.rowTree as Map<string, any>, new Map(), new Map(), this.rowHeaders, options.rows);
         }
         else
@@ -54,7 +53,6 @@ export class Pivot {
 
         this.columnHeaders = [];
         if (this.options.columns.length > 0) {
-            //this.columnHeaders = [options.columns.map(_ => new Header(null, null, null, 0, true, false, "", 1, 1, false))]
             this.makeHeaders(this.columnTree as Map<string, any>, new Map(), new Map(), this.columnHeaders, options.columns);
         }
         else
@@ -62,8 +60,6 @@ export class Pivot {
 
         this.sort();
         this.makeCells();
-        //this.columnHeaders = Arrays.rotate(this.columnHeaders);
-        console.log(this.rowHeaders);
     }
     load(data: Array<object>) {
         this.data = this.convert(data, this.options.fields);
@@ -72,18 +68,13 @@ export class Pivot {
     private sort() {
         var sort = new Sort(this.columnHeaders);
         for (let i = 0; i < this.options.columns.length; i++) {
-            if (this.options.columns[i].sort == SortOrder.none)
-                continue;
-            sort.orderBy(((f: Array<HeaderCell>) => f[i].value), this.options.columns[i].type, this.options.columns[i].sort == SortOrder.desc);
+            sort.orderBy(((f: Header) => f.headerCells[i].value), this.options.columns[i].type, this.options.columns[i].sort == SortOrder.desc);
         }
         sort.do();
 
         sort = new Sort(this.rowHeaders);
         for (let i = 0; i < this.options.rows.length; i++) {
-            if (this.options.rows[i].sort == SortOrder.none)
-                continue;
-
-            sort.orderBy(((f: Array<HeaderCell>) => f[i].value), this.options.rows[i].type, this.options.rows[i].sort == SortOrder.desc);
+            sort.orderBy(((f: Header) => f.headerCells[i].value), this.options.rows[i].type, this.options.rows[i].sort == SortOrder.desc);
         } sort.do();
     }
 
@@ -105,6 +96,7 @@ export class Pivot {
                 }
                 path.set(f.field?.name, f.value);
             });
+
             let one: Array<ValueCell> = [];
             for (let col of this.columnHeaders) {
                 let part2: Map<string | null, any> | ValueCell = part1;
@@ -121,15 +113,17 @@ export class Pivot {
                     path.set(f.field?.name, f.value);
                 });
                 for (let value of this.options.values) {
+                    let valueCell: ValueCell;
                     if (!part2.has(value.name)) {
-                        let nullCell = new ValueCell(0, '0', path, value);
-                        part2.set(value.name, nullCell)
-                        one.push(nullCell);
+                        valueCell = new ValueCell(0, '0', path, value);
+                        part2.set(value.name, valueCell)
                     }
-                    else if (part2.get(value.name) instanceof ValueCell)
-                        one.push(part2.get(value.name) as ValueCell);
+                    else //if (part2.get(value.name) instanceof ValueCell)
+                        valueCell = part2.get(value.name) as ValueCell;
+
+                    col.valueCells.push(valueCell);
+                    one.push(valueCell);
                 }
-                col.valueCells.push(...one);
             }
             row.valueCells.push(...one);
             this.cells.push(one);
@@ -233,7 +227,7 @@ export class Pivot {
             if (/^(1.?)*(0.?)*$/.test(array))//不要中间NULL或者中间非NULL
             {
                 let mapping = Array.from(temp.values());
-                let header = new Header(mapping);
+                let header = new Header(mapping.map(f => new HeaderCell(f.value, f.text, f.path, f.field, f.index)));
                 header.path = path;
                 mapping.forEach(f => f.parent = header);
                 result.push(header);
@@ -304,19 +298,15 @@ export class Pivot {
             if (temp.has(i[1]))
                 temp = temp.get(i[1])
         }
-        debugger;
         let tree = [...temp].filter(f => f[0] != null);
         this.doHide(new Map(tree), hidden);
     }
     public doHide(tree: Map<string | null, any>, hidden: boolean) {
-
         for (let i of tree) {
             if (i[1] instanceof Map)
                 this.doHide(i[1], hidden);
-            else if (i[1] instanceof HeaderCell) {
-                if (i[1].parent == null)
-                    debugger;
-
+            else if (i[1] instanceof HeaderCell && i[1].parent != null) {
+                i[1].parent.hidden = hidden;
                 i[1].parent.headerCells.forEach(f => f.hidden = hidden);
                 i[1].parent.valueCells.forEach(f => f.hidden = hidden);
             }

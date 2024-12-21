@@ -8,6 +8,8 @@ import ColumnHeaderArea from './ColumnHeaderArea.vue';
 import RowHeaderArea from './RowHeaderArea.vue';
 import FieldsPanel from './FieldsPanel.vue';
 var options = new PivotOptions({
+    height:500,
+    width:1200,
     showFieldsPanel: 'right',
     fields: [
         { name: 'item_code', title: '代码', type: 'string' },
@@ -63,31 +65,36 @@ pivot.onPropertyChanged = function (redraw:boolean) {
     const instance = getCurrentInstance();
     instance?.proxy?.$forceUpdate();
 }
+
 let scrollTop = ref(0);
 let scrollLeft = ref(0);
+let rowAreaWidth=ref(0);
 let onScroll = function (e: any) {
     if (e.target != null) {
         scrollTop.value = e.target.scrollTop
         scrollLeft.value = e.target.scrollLeft;
     }
 }
+let resize = function (width: number, height: number) {
+    rowAreaWidth.value = width;
+}
 </script>
 <template>
     <table class="pivot" :style="{ width: options.width + 'px', height: options.height + 'px' }">
         <tr style="height: 30px;">
-            <td></td>
-            <td style="width:70%" class="holder columns" v-bind:scrollLeft="scrollLeft">
+            <td v-bind:width="rowAreaWidth"></td>
+            <td style="width:99%" class="holder columns" v-bind:scrollLeft="scrollLeft">
                 <ColumnHeaderArea :pivot="pivot" :left="scrollLeft">
                 </ColumnHeaderArea>
             </td>
-            <td rowspan="2">
+            <td style="width: 200px;" rowspan="2">
                 <FieldsPanel :pivot="pivot"></FieldsPanel>
             </td>
         </tr>
         <tr>
             <td style="padding:0">
                 <div style="position: relative;height: 100%;overflow-y: hidden" v-bind:scrollTop="scrollTop">
-                    <RowHeaderArea :pivot="pivot" :top="scrollTop"></RowHeaderArea>
+                    <RowHeaderArea :pivot="pivot" :top="scrollTop" :resize="resize"></RowHeaderArea>
                 </div>
             </td>
             <td style="padding: 0">

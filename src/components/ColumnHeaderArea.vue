@@ -16,7 +16,7 @@ export default {
             this.pivot.collapse(header, Area.column);
         },
         getAggregators(): Array<any> {
-            let headers = this.pivot.columnHeaders;
+            let headers = this.pivot.columnHeaders.filter(f=>!f.hidden);
             let values = this.pivot.options.values;
             let result: Array<any> = [];
             for (let i = 0; i < headers.length; i++) {
@@ -36,8 +36,8 @@ export default {
 
     <table class="pivot-frame">
         <tr>
-            <td class="pivot-cell header-row" v-for="(header) in pivot.columnHeaders">
-                <div class="pivot-cell header" v-for="(cell, j) in header.trim()" :class="j==1?'even':''">
+            <td class="pivot-cell header-row" v-for="(header) in pivot.columnHeaders" :class="{'hidden':header.hidden}">
+                <div class="pivot-cell header" v-for="(cell, j) in header.trim()"  :class="{'hidden':cell.hidden,'even':j==1}" >
                     <span v-if="cell.value !== null">{{ cell.value }}</span>
                     <span v-if="cell.value === null" v-on:click="collapse(header)">合计</span>
                 </div>
@@ -65,5 +65,7 @@ export default {
 .header-row .even{
     border-top: 1px solid;
 }
-
+.hidden{
+    display: none;
+}
 </style>

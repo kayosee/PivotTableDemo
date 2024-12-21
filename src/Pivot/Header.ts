@@ -7,6 +7,7 @@ export class Header {
     valueCells: Array<ValueCell> = [];
     collapsed: boolean = false;
     collapseable: boolean = false;
+    hidden: boolean = false;
     path: Map<string | null, string | null> = new Map();
     constructor(headerCells: Array<HeaderCell>) {
         this.headerCells = headerCells;
