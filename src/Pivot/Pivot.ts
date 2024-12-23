@@ -273,7 +273,7 @@ export class Pivot {
         if (header.path == null)
             return;
 
-        let path = [...header.path].filter(f=>f[1]!=null);
+        let path = [...header.path].filter(f => f[1] != null);
         let key = JSON.stringify(Object.fromEntries(path)).replace(/[{}]/g, '');
         if (!header.collapsed) {
             let index = array.findIndex(f => f == key);

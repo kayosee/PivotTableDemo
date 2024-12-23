@@ -27,12 +27,16 @@
             <el-form-item prop="critera" :label="getName(field.comparison)"
                 :rules="[{ required: true, message: '请输入内容' }]"
                 v-if="['equals', 'notEquals', 'greater', 'greaterOrEquals', 'less', 'lessOrEquals', 'like', 'notLike'].find(f => f == field.comparison)">
-                <el-select v-if="['equals', 'notEquals'].find(f=>f==field.comparison)&&field.type == 'string'" v-model="field.critera" allow-create filterable>
+                <el-select v-if="['equals', 'notEquals'].find(f => f == field.comparison) && field.type == 'string'"
+                    v-model="field.critera" allow-create filterable>
                     <el-option v-for="item in field.constants" :key="item" :label="item" :value="item"></el-option>
                 </el-select>
-                <el-input-number style="width: 100%" v-if="field.type == 'number'" v-model="field.critera"></el-input-number>
-                <el-date-picker style="width: 100%" type="date" v-if="field.type == 'date'" v-model="field.critera"></el-date-picker>
-                <el-date-picker style="width: 100%" type="datetime" v-if="field.type == 'datetime'" v-model="field.critera"></el-date-picker>
+                <el-input-number style="width: 100%" v-if="field.type == 'number'"
+                    v-model="field.critera"></el-input-number>
+                <el-date-picker style="width: 100%" type="date" v-if="field.type == 'date'"
+                    v-model="field.critera"></el-date-picker>
+                <el-date-picker style="width: 100%" type="datetime" v-if="field.type == 'datetime'"
+                    v-model="field.critera"></el-date-picker>
                 <el-time-picker style="width: 100%" v-if="field.type == 'time'" v-model="field.critera" />
             </el-form-item>
             <el-form-item label="区间" required v-if="['between', 'notBetween'].find(f => f == field.comparison)">
@@ -87,12 +91,16 @@ import { FilterField } from '../../Pivot/Fields/FilterField';
 export default {
     name: 'FilterDialog',
     data: function () {
+        let field: any = {};
+        let handler: any =  { };
+        let form: any = {};
         return {
             show: false,
-            field: null,
-            handler: null,
+            field: field,
+            handler: handler,
             inputVisible: false,
-            inputValue: ''
+            inputValue: '',
+            form: form
         }
     },
     methods: {
@@ -100,7 +108,8 @@ export default {
             return ComparisonName[key];
         },
         save: function () {
-            this.$refs.form.validate((valid: boolean) => {
+            let form: any = this.$refs.form;
+            form.validate((valid: boolean) => {
                 if (valid) {
                     this.show = false;
                     if (this.handler != null)
@@ -110,7 +119,7 @@ export default {
         },
         open: function (field: FilterField, handler: Function) {
             this.show = true;
-            this.field = new FilterField(field.name, field.title, field.type, field.index, field.style, field.comparison, field.critera, field.start, field.end, field.list,field.constants);
+            this.field = new FilterField(field.name, field.title, field.type, field.index, field.style, field.comparison, field.critera, field.start, field.end, field.list, field.constants);
             this.handler = handler;
         },
         handleClose: function (tag: string | Date | number) {
@@ -119,7 +128,7 @@ export default {
         showInput: function () {
             this.inputVisible = true;
             nextTick(() => {
-                this.$refs.inputRef.value!.input!.focus();
+                this.form.value!.input!.focus();
             })
         },
         handleInputConfirm: function () {
@@ -128,7 +137,13 @@ export default {
             }
             this.inputVisible = false
             this.inputValue = ''
-        }
+        },
+    },
+    mounted: function () {
+        let me = this;
+        nextTick(() => {
+            me.form = this.$refs.inputRef;
+        })
     }
 }
 </script>

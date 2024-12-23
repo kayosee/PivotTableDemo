@@ -2,7 +2,7 @@
     <el-dialog v-model="show" title="下钻" width="800">
         <el-table :data="details" style="width: 100%" height="400">
             <el-table-column v-for="header in headers" :prop="header.name" :label="header.title" width="180"
-            :formatter="format"/>
+                :formatter="format" />
         </el-table></el-dialog>
 </template>
 <script lang="ts">
@@ -13,10 +13,12 @@ import { DataType } from '../../Pivot/Enums/DataType';
 export default {
     name: 'DrillDownDialog',
     data: function () {
+        let details: Array<any> = [];
+        let headers: Array<Field> = [];
         return {
             show: false,
-            details: [],
-            headers: []
+            details: details,
+            headers: headers
         }
     },
     methods: {

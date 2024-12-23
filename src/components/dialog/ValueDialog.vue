@@ -6,7 +6,6 @@
             </el-form-item>
             <el-form-item label="排序" prop="sort" required>
                 <el-select v-model="field.sort" placeholder="排序规则">
-                    <el-option label="不排序" value="none" />
                     <el-option label="升序" value="asc" />
                     <el-option label="降序" value="desc" />
                 </el-select>
@@ -56,22 +55,29 @@
     </el-dialog>
 </template>
 <script lang="ts">
+import { nextTick } from 'vue';
 import { Field } from '../../Pivot/Fields/Field';
 import { ValueField } from '../../Pivot/Fields/ValueField';
 export default {
     name: 'ValueDialog',
+
     data: function () {
+        let field: any = {};
+        let handler: any = {};
+        let form: any = {};
+        let keys: Array<any> = [];
         return {
             show: false,
-            field: null,
-            keys: [],
-            handler: null,
+            field: field,
+            keys: keys,
+            handler: handler,
+            form: form,
             min: 0
         }
     },
     methods: {
         save: function () {
-            this.$refs.form.validate((valid: boolean) => {
+            this.form.validate((valid: boolean) => {
                 if (valid) {
                     this.show = false;
                     if (this.handler != null)
@@ -85,6 +91,12 @@ export default {
             this.keys = keys;
             this.show = true;
         }
+    },
+    mounted: function () {
+        let me = this;
+        nextTick(() => {
+            me.form = me.$refs.form;
+        })
     }
 }
 </script>

@@ -6,7 +6,6 @@
             </el-form-item>
             <el-form-item label="排序" prop="sort" required>
                 <el-select v-model="field.sort" placeholder="排序规则">
-                    <el-option label="不排序" value="none" />
                     <el-option label="升序" value="asc" />
                     <el-option label="降序" value="desc" />
                 </el-select>
@@ -42,18 +41,23 @@
 import { ColumnField } from '../../Pivot/Fields/ColumnField';
 import { RowField } from '../../Pivot/Fields/RowField';
 import { Field } from '../../Pivot/Fields/Field';
+import { nextTick } from 'vue';
 export default {
     name: 'RowColumnDialog',
     data: function () {
+        let field: any = {};
+        let handler: any = {};
+        let form: any = {};
         return {
             show: false,
-            field: null,
-            handler: null,
+            field: field,
+            handler: handler,
+            form: form
         }
     },
     methods: {
         save: function () {
-            this.$refs.form.validate((valid: boolean) => {
+            this.form.validate((valid: boolean) => {
                 if (valid) {
                     this.show = false;
                     if (this.handler != null)
@@ -66,10 +70,16 @@ export default {
                 this.field = new RowField(field.name, field.title, field.type, field.index, field.style, field.format, field.formatter, field.sort);
             else
                 this.field = new RowField(field.name, field.title, field.type, field.index, field.style, field.format, field.formatter, "asc");
-            
+
             this.handler = handler;
             this.show = true;
         }
+    },
+    mounted: function () {
+        let me = this;
+        nextTick(() => {
+            me.form = me.$refs.form;
+        })
     }
 }
 </script>

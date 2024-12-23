@@ -11,6 +11,7 @@ import ColumnDialog from './dialog/ColumnDialog.vue';
 import RowDialog from './dialog/RowDialog.vue';
 import ValueDialog from './dialog/ValueDialog.vue';
 import { Arrays } from '../Pivot/Utils/Arrays';
+import { nextTick } from 'vue';
 export default {
     components: {
         ColumnDialog,
@@ -20,7 +21,15 @@ export default {
     },
     name: 'FieldsPanel',
     data: function () {
+        let valueDialog: any = {};
+        let filterDialog: any = {};
+        let rowDialog: any = {};
+        let columnDialog: any = {};
         return {
+            valueDialog: valueDialog,
+            filterDialog: filterDialog,
+            rowDialog: rowDialog,
+            columnDialog: columnDialog
         }
     },
     props: {
@@ -99,7 +108,7 @@ export default {
             let me = this;
             switch (area) {
                 case Area.column:
-                    this.$refs.columnDialog.open(field, function (result: RowField | ColumnField) {
+                    this.columnDialog.open(field, function (result: RowField | ColumnField) {
                         let which = field as RowField | ColumnField;
                         which.sort = result.sort;
                         which.format = result.format;
@@ -110,7 +119,7 @@ export default {
                     });
                     break;
                 case Area.row:
-                    this.$refs.rowDialog.open(field, function (result: RowField | ColumnField) {
+                    this.rowDialog.open(field, function (result: RowField | ColumnField) {
                         let which = field as RowField | ColumnField;
                         which.sort = result.sort;
                         which.format = result.format;
@@ -121,7 +130,7 @@ export default {
                     });
                     break;
                 case Area.value:
-                    this.$refs.valueDialog.open(field, function (result: ValueField) {
+                    this.valueDialog.open(field, function (result: ValueField) {
                         let which = field as ValueField;
                         which.aggregator = result.aggregator;
                         which.distinct = result.distinct;
@@ -135,7 +144,7 @@ export default {
                     }, [...this.pivot.options.fields]);
                     break;
                 case Area.filter:
-                    this.$refs.filterDialog.open(field, function (result: FilterField) {
+                    this.filterDialog.open(field, function (result: FilterField) {
                         let which = field as FilterField;
                         which.comparison = result.comparison;
                         which.critera = result.critera;
@@ -151,6 +160,15 @@ export default {
                     break;
             }
         }
+    },
+    mounted: function () {
+        let me = this;
+        nextTick(() => {
+            me.valueDialog = me.$refs.valueDialog;
+            me.filterDialog = me.$refs.filterDialog;
+            me.rowDialog = me.$refs.rowDialog;
+            me.columnDialog = me.$refs.columnDialog;
+        })
     }
 }
 </script>
@@ -162,7 +180,7 @@ export default {
     <ValueDialog ref="valueDialog"></ValueDialog>
     <table class="pivot-frame">
         <tr class="row">
-            <td colspan="2" class="label">所有列</td>
+            <td colspan="2" class="label">所有字段</td>
         </tr>
         <tr class="row">
             <td colspan="2" v-on:drop="(e) => drop(e, 'field')" v-on:dragover="allowDrop"
