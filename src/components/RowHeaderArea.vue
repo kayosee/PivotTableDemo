@@ -12,7 +12,7 @@ export default {
         rowTable: null,
         pivot: {
             type: Pivot,
-            default: {}
+            default: new Pivot()
         },
         headers: {
             type: Array<Array<HeaderCell>>,

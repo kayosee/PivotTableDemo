@@ -141,7 +141,7 @@ export default {
     },
     mounted: function () {
         let me = this;
-        nextTick(() => {
+        this.$nextTick(() => {
             me.form = this.$refs.inputRef;
         })
     }

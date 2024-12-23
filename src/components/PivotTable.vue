@@ -1,78 +1,61 @@
-<script lang="ts" setup>
+<script lang="ts">
 import { ref } from 'vue';
 import { Pivot } from '../Pivot/Pivot.ts';
-import { PivotOptions } from '../Pivot/PivotOptions';
-import { data } from '../Pivot/data';
 import CellArea from './CellArea.vue'
 import ColumnHeaderArea from './ColumnHeaderArea.vue';
 import RowHeaderArea from './RowHeaderArea.vue';
 import FieldsPanel from './FieldsPanel.vue';
-var options = new PivotOptions({
-    height: 500,
-    width: 1200,
-    showFieldsPanel: 'right',
-    fields: [
-        { name: 'item_code', title: '代码', type: 'string' },
-        { name: 'item_name', title: '名称', type: 'string' },
-        { name: 'plan_task_no', title: '生产任务号', type: 'string' },
-        { name: 'product_task', title: '工单号', type: 'string' },
-        { name: 'task_no', title: '批次号', type: 'string' },
-        { name: 'plan_qty', title: '计划数量', type: 'number' },
-        { name: 'complete_qty', title: '完成数量', type: 'number' },
-        { name: 'inferior_qty', title: '次品数量', type: 'number' },
-        { name: 'stall', title: '精度', type: 'string' },
-        { name: 'pack', title: '包装', type: 'string' },
-        { name: 'status', title: '状态', type: 'string' },
-        { name: 'end_worker', title: '工人', type: 'string' },
-        { name: 'route', title: '工艺路线', type: 'string' },
-        { name: 'start_time', title: '开工时间', type: 'date', format: 'date' },
-        { name: 'end_time', title: '报工时间', type: 'date', format: 'date' },
+import { PivotOptions } from '../Pivot/PivotOptions.ts';
+export default {
+    name: 'PivotTable',
+    
+    components: {
+        ColumnHeaderArea,
+        RowHeaderArea,
+        FieldsPanel,
+        CellArea,
+    },
+    data: function () {
+        var pivot: Pivot = new Pivot();
+        let scrollTop = ref(0);
+        let scrollLeft = ref(0);
+        let rowAreaWidth = ref(0);
 
-    ],
-    columns: [
-        { field: 'pack', style: {} },
-        { field: 'stall', style: {} },
-    ],
-    rows: [
-        { field: 'route', style: {} },
-        { field: 'end_worker', style: {} },
-    ],
-    values: [
-        {
-            field: 'complete_qty', aggregator: 'sum', style: function (value: number) {
-                if (value > 5000)
-                    return 'color:red;font-weight:bold';
-                return 'color:black';
-            }, format: 'decimal'
+        return {
+            pivot,
+            scrollTop,
+            scrollLeft,
+            rowAreaWidth,
         }
-    ],
-    filters: [
-        {
-            field: 'status', comparison: 'equals', critera: '已完工'
+    },
+    methods: {
+        resize: function (width: number, height: number) {
+            this.rowAreaWidth = width;
         },
-        {
-            field: 'start_time', comparison: 'greater', critera: '2021-01-02'
+        onScroll: function (e: any) {
+            if (e.target != null) {
+                this.scrollTop = e.target.scrollTop
+                this.scrollLeft = e.target.scrollLeft;
+            }
+        },
+        init: function (options: PivotOptions) {
+            this.pivot.init(options);
+        },
+        load: function (data: Array<any>) {
+            this.pivot.load(data);
         }
-    ]
-});
-
-var pivot = ref(new Pivot(options));
-pivot.value.load(data);
-let scrollTop = ref(0);
-let scrollLeft = ref(0);
-let rowAreaWidth = ref(0);
-let onScroll = function (e: any) {
-    if (e.target != null) {
-        scrollTop.value = e.target.scrollTop
-        scrollLeft.value = e.target.scrollLeft;
+    },
+    props: {
+        options: {
+            type: PivotOptions
+        }
     }
 }
-let resize = function (width: number, height: number) {
-    rowAreaWidth.value = width;
-}
+
+
 </script>
 <template>
-    <table class="pivot" :style="{ width: options.width + 'px', height: options.height + 'px' }">
+    <table v-if="pivot.options" class="pivot" :style="{ width: pivot.options.width + 'px', height: pivot.options.height + 'px' }">
         <tr style="height: 30px;">
             <td v-bind:width="rowAreaWidth"></td>
             <td style="width:99%" class="holder columns" v-bind:scrollLeft="scrollLeft">

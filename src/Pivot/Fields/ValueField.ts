@@ -64,10 +64,8 @@ export class ValueField extends Field implements ISortable {
         this.style = style;
         if (sort == 'desc')
             this.sort = SortOrder.desc;
-        else if (sort == 'asc')
-            this.sort = SortOrder.asc;
         else
-            this.sort = SortOrder.none;
+            this.sort = SortOrder.asc;
     }
     sort: SortOrder;
 }

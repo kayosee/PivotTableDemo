@@ -11,7 +11,6 @@ import ColumnDialog from './dialog/ColumnDialog.vue';
 import RowDialog from './dialog/RowDialog.vue';
 import ValueDialog from './dialog/ValueDialog.vue';
 import { Arrays } from '../Pivot/Utils/Arrays';
-import { nextTick } from 'vue';
 export default {
     components: {
         ColumnDialog,
@@ -35,7 +34,7 @@ export default {
     props: {
         pivot: {
             type: Pivot,
-            default: {}
+            default: new Pivot()
         },
 
     },
@@ -163,11 +162,11 @@ export default {
     },
     mounted: function () {
         let me = this;
-        nextTick(() => {
-            me.valueDialog = me.$refs.valueDialog;
-            me.filterDialog = me.$refs.filterDialog;
-            me.rowDialog = me.$refs.rowDialog;
-            me.columnDialog = me.$refs.columnDialog;
+        this.$nextTick(() => {
+            me.valueDialog = this.$refs.valueDialog;
+            me.filterDialog = this.$refs.filterDialog;
+            me.rowDialog = this.$refs.rowDialog;
+            me.columnDialog = this.$refs.columnDialog;
         })
     }
 }

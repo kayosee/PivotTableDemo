@@ -41,7 +41,6 @@
 import { ColumnField } from '../../Pivot/Fields/ColumnField';
 import { RowField } from '../../Pivot/Fields/RowField';
 import { Field } from '../../Pivot/Fields/Field';
-import { nextTick } from 'vue';
 export default {
     name: 'RowColumnDialog',
     data: function () {
@@ -77,8 +76,8 @@ export default {
     },
     mounted: function () {
         let me = this;
-        nextTick(() => {
-            me.form = me.$refs.form;
+        this.$nextTick(() => {
+            me.form = this.$refs.form;
         })
     }
 }

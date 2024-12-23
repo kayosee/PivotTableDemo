@@ -8,7 +8,7 @@ export default {
     props: {
         pivot: {
             type: Pivot,
-            default: {}
+            default: new Pivot()
         }
     },
     methods: {

@@ -55,7 +55,6 @@
     </el-dialog>
 </template>
 <script lang="ts">
-import { nextTick } from 'vue';
 import { Field } from '../../Pivot/Fields/Field';
 import { ValueField } from '../../Pivot/Fields/ValueField';
 export default {
@@ -94,8 +93,8 @@ export default {
     },
     mounted: function () {
         let me = this;
-        nextTick(() => {
-            me.form = me.$refs.form;
+        this.$nextTick(() => {
+            me.form = this.$refs.form;
         })
     }
 }

@@ -21,39 +21,42 @@ export class Pivot {
     view: Array<any> = [];
     cells: Array<Array<Cell>> = [];
     rowHeaders: Array<Header> = [];
-    rowTree: Map<string | null, any> = new Map();
-    cellTree: Map<string | null, any> = new Map();
-    columnTree: Map<string | null, any> = new Map();
+    rowMap: Map<string | null, any> = new Map();
+    cellMap: Map<string | null, any> = new Map();
+    columnMap: Map<string | null, any> = new Map();
     columnHeaders: Array<Header> = [];
     hiddenRows: Array<string> = [];
     hiddenColumns: Array<string> = [];
     onPropertyChanged: Function | null = null;
-    constructor(options: PivotOptions) {
+    constructor() {
+        this.options = new PivotOptions({});
+    }
+    init(options: PivotOptions) {
         this.options = options;
     }
     calc() {
         let options = this.options;
         this.view = this.filter(this.data, options.filters);
 
-        this.rowTree = new Map();
-        this.makeCellMap(this.rowTree, options.rows, new Map(), this.view, this.makeHeaderCell);
+        this.rowMap = new Map();
+        this.makeCellMap(this.rowMap, options.rows, new Map(), this.view, this.makeHeaderCell);
 
-        this.columnTree = new Map();
-        this.makeCellMap(this.columnTree, options.columns, new Map(), this.view, this.makeHeaderCell);
+        this.columnMap = new Map();
+        this.makeCellMap(this.columnMap, options.columns, new Map(), this.view, this.makeHeaderCell);
 
-        this.cellTree = new Map();
-        this.makeCellMap(this.cellTree, [...options.rows, ...options.columns], new Map(), this.view, this.makeValueCell);
+        this.cellMap = new Map();
+        this.makeCellMap(this.cellMap, [...options.rows, ...options.columns], new Map(), this.view, this.makeValueCell);
 
         this.rowHeaders = [];
         if (this.options.rows.length > 0) {
-            this.makeHeaders(this.rowTree as Map<string, any>, new Map(), new Map(), this.rowHeaders, options.rows);
+            this.makeHeaders(this.rowMap as Map<string, any>, new Map(), new Map(), this.rowHeaders, options.rows);
         }
         else
             this.rowHeaders = [new Header([new HeaderCell(null, '', null, null, 0)])];
 
         this.columnHeaders = [];
         if (this.options.columns.length > 0) {
-            this.makeHeaders(this.columnTree as Map<string, any>, new Map(), new Map(), this.columnHeaders, options.columns);
+            this.makeHeaders(this.columnMap as Map<string, any>, new Map(), new Map(), this.columnHeaders, options.columns);
         }
         else
             this.columnHeaders = [new Header([new HeaderCell(null, '', null, null, 0)])];
@@ -62,6 +65,7 @@ export class Pivot {
         this.makeCells();
     }
     load(data: Array<object>) {
+
         this.data = this.convert(data, this.options.fields);
         this.calc();
     }
@@ -82,7 +86,7 @@ export class Pivot {
         this.cells = [];
         for (let row of this.rowHeaders) {
             let path: Map<string | null, any> = new Map();
-            let part1: Map<string | null, any> | ValueCell = this.cellTree;
+            let part1: Map<string | null, any> | ValueCell = this.cellMap;
 
             row.headerCells.forEach((f, i) => {
                 if (f.field == null)
@@ -284,9 +288,9 @@ export class Pivot {
             array.push(key)
 
         if (area == Area.column)
-            this.hideCells(new Map(path), this.columnTree, header.collapsed);
+            this.hideCells(new Map(path), this.columnMap, header.collapsed);
         else if (area == Area.row)
-            this.hideCells(new Map(path), this.rowTree, header.collapsed);
+            this.hideCells(new Map(path), this.rowMap, header.collapsed);
 
         if (this.onPropertyChanged)
             this.onPropertyChanged(false);
@@ -316,7 +320,8 @@ export class Pivot {
         let details = this.data;
         for (let i of path) {
             if (i[0] != null && i[1] != null) {
-                details = details.filter(f => f[i[0]] == i[1]);
+                let key: string = i[0] as string;
+                details = details.filter(f => f[key] == i[1]);
             }
         }
         return details;
