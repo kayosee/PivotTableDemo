@@ -11,7 +11,7 @@ export default {
     props: {
         rowTable: null,
         pivot: {
-            type: Pivot,
+            type: Object,
             default: new Pivot()
         },
         headers: {
@@ -37,10 +37,10 @@ export default {
     },
     mounted: function () {
         let me = this;
-        this.$nextTick(() => {
+        setTimeout(() => {
             let ele: any = this.$refs.table;
             new ResizeObserver(() => me.resize(ele.offsetWidth, ele.offsetHeight)).observe(ele);
-        })
+        },1)
 
     }
 }
@@ -48,7 +48,7 @@ export default {
 
 <template>
     <table ref="table" class="pivot-frame">
-        <tr class="row" v-for="(header) in pivot.rowHeaders" :key="header.id" :class="{'unwindable':!header.collapseable()}">
+        <tr class="row" v-for="(header) in pivot.rowHeaders" :key="header.id" :class="{'total':header.collapseable()}">
             <td class="pivot-cell" v-for="(cell) in header.trim()" :key="cell.id" :colspan="cell.rowspan"
                 :class="{ 'hidden': cell.hidden }">
                 <div v-if="cell.value !== null">{{ cell.value }}</div>

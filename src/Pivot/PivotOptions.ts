@@ -15,11 +15,15 @@ export class PivotOptions {
     filters: FilterField[] = [];
     width: Number = 1200;
     height: Number = 600;
+    autosize: boolean = true;
     nullValue: string = "(空白)";
     showFieldsPanel: ShowFieldsPanel = ShowFieldsPanel.right;
     constructor(options: any) {
         if (options.hasOwnProperty("nullValue"))
             this.nullValue = options["nullValue"];
+
+        if (options.hasOwnProperty("autosize"))
+            this.autosize = options["autosize"];
 
         if (options.hasOwnProperty("width"))
             this.width = new Number(options["width"]);

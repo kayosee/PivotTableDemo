@@ -33,7 +33,7 @@ export default {
     },
     props: {
         pivot: {
-            type: Pivot,
+            type: Object,
             default: new Pivot()
         },
 
@@ -74,7 +74,7 @@ export default {
         },
         moveField: function (from: Area, to: Area, index: number, fieldName: string) {
             let me = this;
-            let field: Field | undefined = this.pivot.options.fields.find(f => f.name == fieldName);
+            let field: Field | undefined = this.pivot.options.fields.find((f:Field) => f.name == fieldName);
             let dialog: any = null;
             if (field != undefined) {
                 if (to == Area.field) {
@@ -89,7 +89,7 @@ export default {
                     dialog = this.$refs.rowDialog;
                 }
                 else if (to == Area.filter) {
-                    if (this.pivot.options.filters.find(f => f.name == fieldName))
+                    if (this.pivot.options.filters.find((f:Field) => f.name == fieldName))
                         return;
                     (field as FilterField).constants = Arrays.distinct(this.pivot.data, field.name);
                     dialog = this.$refs.filterDialog;
@@ -161,13 +161,12 @@ export default {
         }
     },
     mounted: function () {
-        let me = this;
-        this.$nextTick(() => {
-            me.valueDialog = this.$refs.valueDialog;
-            me.filterDialog = this.$refs.filterDialog;
-            me.rowDialog = this.$refs.rowDialog;
-            me.columnDialog = this.$refs.columnDialog;
-        })
+        setTimeout(() => {
+            this.valueDialog = this.$refs.valueDialog;
+            this.filterDialog = this.$refs.filterDialog;
+            this.rowDialog = this.$refs.rowDialog;
+            this.columnDialog = this.$refs.columnDialog;
+        }, 1);
     }
 }
 </script>
@@ -177,7 +176,7 @@ export default {
     <ColumnDialog ref="columnDialog"></ColumnDialog>
     <RowDialog ref="rowDialog"></RowDialog>
     <ValueDialog ref="valueDialog"></ValueDialog>
-    <table class="pivot-frame">
+    <table class="pivot-frame panel">
         <tr class="row">
             <td colspan="2" class="label">所有字段</td>
         </tr>
@@ -236,16 +235,18 @@ export default {
     </table>
 </template>
 <style lang="css" scoped>
-table {
+.panel {
     width: 100%;
     height: 100%;
 }
-
+.panel td{
+    padding: 0;
+}
 .label {
     text-align: center;
 }
 
-div {
+.panel div {
     text-align: center;
 }
 </style>

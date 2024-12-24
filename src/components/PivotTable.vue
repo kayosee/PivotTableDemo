@@ -1,5 +1,5 @@
 <script lang="ts">
-import { ref } from 'vue';
+import { Ref, ref } from 'vue';
 import { Pivot } from '../Pivot/Pivot.ts';
 import CellArea from './CellArea.vue'
 import ColumnHeaderArea from './ColumnHeaderArea.vue';
@@ -8,7 +8,7 @@ import FieldsPanel from './FieldsPanel.vue';
 import { PivotOptions } from '../Pivot/PivotOptions.ts';
 export default {
     name: 'PivotTable',
-    
+
     components: {
         ColumnHeaderArea,
         RowHeaderArea,
@@ -17,19 +17,32 @@ export default {
     },
     data: function () {
         var pivot: Pivot = new Pivot();
+        let width = ref(0);
+        let height = ref(0);
+        let autosize = false;
         let scrollTop = ref(0);
         let scrollLeft = ref(0);
         let rowAreaWidth = ref(0);
 
+        let pageSize=ref(0);
+        let currentPage=ref(0);
+
+        let table: any;
         return {
             pivot,
+            table,
+            width,
+            height,
+            autosize,
             scrollTop,
             scrollLeft,
             rowAreaWidth,
+            pageSize,
+            currentPage,
         }
     },
     methods: {
-        resize: function (width: number, height: number) {
+        resize: function (width: number, _: number) {
             this.rowAreaWidth = width;
         },
         onScroll: function (e: any) {
@@ -38,31 +51,53 @@ export default {
                 this.scrollLeft = e.target.scrollLeft;
             }
         },
-        init: function (options: PivotOptions) {
-            this.pivot.init(options);
+        init: function (options: Ref<PivotOptions>) {
+            if (options != null) {
+                this.pivot.init(options.value);
+                this.autosize = options.value.autosize;
+                if (!this.autosize) {
+                    this.width = options.value.width.valueOf();
+                    this.height = options.value.height.valueOf();
+                }
+            }
         },
         load: function (data: Array<any>) {
             this.pivot.load(data);
-        }
+        },
+        pageSizeChange:function(){
+
+        },
+        currentPageChange:function(){}
     },
     props: {
         options: {
             type: PivotOptions
         }
+    },
+    mounted: function () {
+        setTimeout(() => {
+            this.table = this.$refs.table;
+            new ResizeObserver(() => {
+                if (this.autosize) {
+                    this.width = this.table.parentElement.offsetWidth;
+                    this.height = this.table.parentElement.offsetHeight;
+                }
+            }).observe(this.table.parentElement);
+        })
     }
 }
 
 
 </script>
 <template>
-    <table v-if="pivot.options" class="pivot" :style="{ width: pivot.options.width + 'px', height: pivot.options.height + 'px' }">
+    <table ref="table" v-if="pivot.options" class="pivot" :style="{ width: width + 'px', height: height + 'px' }">
         <tr style="height: 30px;">
-            <td v-bind:width="rowAreaWidth"></td>
+            <td v-bind:width="rowAreaWidth-2"></td>
             <td style="width:99%" class="holder columns" v-bind:scrollLeft="scrollLeft">
                 <ColumnHeaderArea :pivot="pivot" :left="scrollLeft">
                 </ColumnHeaderArea>
             </td>
-            <td style="width: 200px;" rowspan="2">
+            <td style="width: 200px;padding: 0;" rowspan="2">
                 <FieldsPanel :pivot="pivot"></FieldsPanel>
             </td>
         </tr>
@@ -78,6 +113,13 @@ export default {
                 </div>
             </td>
         </tr>
+        <tr><td colspan="3" style="padding:3px">
+            <el-pagination v-model:current-page="currentPage" :page-size="100" :size="pageSize" layout="total, sizes, prev, pager, next, jumper"
+      :total="pivot.cells.length"
+      @size-change="pageSizeChange"
+      @current-change="currentPageChange"
+    />
+        </td></tr>
     </table>
 </template>
 <style scoped>

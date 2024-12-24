@@ -1,12 +1,11 @@
 <template>
     <el-dialog v-model="show" title="字段选项" :align-center="true">
-        <el-form :model="field" ref="form" label-width="auto">
+        <el-form :model="field" :ref="(e:any)=>{form=e;}" label-width="auto">
             <el-form-item label="字段">
                 <el-input v-model="field.title" disabled></el-input>
             </el-form-item>
             <el-form-item label="排序" prop="sort" required>
                 <el-select v-model="field.sort" placeholder="排序规则">
-                    <el-option label="不排序" value="none" />
                     <el-option label="升序" value="asc" />
                     <el-option label="降序" value="desc" />
                 </el-select>
@@ -76,10 +75,9 @@ export default {
         }
     },
     mounted: function () {
-        let me = this;
-        this.$nextTick(() => {
-            me.form = this.$refs.form;
-        })
+        setTimeout(() => {
+            this.form = this.$refs.form;
+        }, 1)
     }
 }
 </script>

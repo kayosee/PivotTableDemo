@@ -56,6 +56,7 @@ export default {
     },
     methods: {
         save: function () {
+            this.form = this.$refs.form;
             this.form.validate((valid: boolean) => {
                 if (valid) {
                     this.show = false;
@@ -75,10 +76,9 @@ export default {
         }
     },
     mounted: function () {
-        let me = this;
-        this.$nextTick(() => {
-            me.form = this.$refs.form;
-        })
+        setTimeout(() => {
+            this.form = this.$refs.form;
+        }, 1);
     }
 }
 </script>

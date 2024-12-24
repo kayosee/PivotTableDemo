@@ -1,6 +1,6 @@
 <template>
     <el-dialog v-model="show" title="字段选项" :align-center="true">
-        <el-form :model="field" ref="form" label-width="auto">
+        <el-form :model="field" ref="form" label-width="auto" v-on:ready="console.log('ready')">
             <el-form-item label="字段">
                 <el-input v-model="field.title" disabled></el-input>
             </el-form-item>
@@ -75,7 +75,8 @@ export default {
         }
     },
     methods: {
-        save: function () {
+        save: function () {            
+            this.form = this.$refs.form;
             this.form.validate((valid: boolean) => {
                 if (valid) {
                     this.show = false;
@@ -92,10 +93,9 @@ export default {
         }
     },
     mounted: function () {
-        let me = this;
-        this.$nextTick(() => {
-            me.form = this.$refs.form;
-        })
+        setTimeout(() => {
+            this.form = this.$refs.form;
+        }, 1)
     }
 }
 </script>

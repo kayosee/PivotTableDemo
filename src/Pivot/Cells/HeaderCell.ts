@@ -8,8 +8,8 @@ export class HeaderCell extends Cell {
     rowspan: number = 1;
     colspan: number = 1;
     parent: Header | null = null;
-    constructor(value: string | number | Date | null, text: string | null, path: Map<string | null, string | null> | null, field: Field | null, index: number) {
-        super(value, text, path);
+    constructor(value: string | number | Date | null, path: Map<string | null, string | null> | null, field: Field | null, index: number) {
+        super(value, field ? field.getText(value) : '', path);
         this.field = field;
         this.index = index;
     }

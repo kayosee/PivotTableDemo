@@ -6,9 +6,12 @@ export class ValueCell extends Cell {
     value: number | null;
     style: string | null = null;
     data: Array<any> = [];
-    constructor(value: number, text: string, path: Map<string | null, string | null> | null, valueField: ValueField) {
-        super(value, text, path);
+    constructor(value: number, path: Map<string | null, string | null> | null, valueField: ValueField) {
+        super(value, valueField.getText(value), path);
         this.valueField = valueField;
         this.value = value;
+    }
+    public isTotal(): boolean {
+        return !this.path ? true : [...this.path.values()].findIndex(f => f == null) >= 0;
     }
 }

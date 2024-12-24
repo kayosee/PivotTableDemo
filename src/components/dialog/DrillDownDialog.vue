@@ -27,7 +27,7 @@ export default {
             this.details = details;
             this.show = true;
         },
-        format: function (column: any, cellValue: any) {
+        format: function (_row: any, column: any, cellValue: any, _index: number) {
             let field: Field | undefined = (this.headers as Array<Field>).find(f => f.name == column.property);
             if (field) {
                 switch (field.type) {

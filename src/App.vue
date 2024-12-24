@@ -3,7 +3,6 @@ import { onMounted, ref } from 'vue';
 import PivotTable from './components/PivotTable.vue';
 import { PivotOptions } from './Pivot/PivotOptions';
 
-import { data } from './Pivot/data';
 let pivotTable: any = ref(null);
 let options = ref(new PivotOptions({
   height: 500,
@@ -57,7 +56,9 @@ let options = ref(new PivotOptions({
 onMounted(() => {
 
   pivotTable.value.init(options);
-  pivotTable.value.load(data);
+  fetch('http://localhost/data.json').then(f => f.json()).
+    then((data) =>
+      pivotTable.value.load(data));
 })
 </script>
 

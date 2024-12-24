@@ -52,14 +52,14 @@ export class Pivot {
             this.makeHeaders(this.rowMap as Map<string, any>, new Map(), new Map(), this.rowHeaders, options.rows);
         }
         else
-            this.rowHeaders = [new Header([new HeaderCell(null, '', null, null, 0)])];
+            this.rowHeaders = [new Header([new HeaderCell(null, null, null, 0)])];
 
         this.columnHeaders = [];
         if (this.options.columns.length > 0) {
             this.makeHeaders(this.columnMap as Map<string, any>, new Map(), new Map(), this.columnHeaders, options.columns);
         }
         else
-            this.columnHeaders = [new Header([new HeaderCell(null, '', null, null, 0)])];
+            this.columnHeaders = [new Header([new HeaderCell(null, null, null, 0)])];
 
         this.sort();
         this.makeCells();
@@ -119,10 +119,10 @@ export class Pivot {
                 for (let value of this.options.values) {
                     let valueCell: ValueCell;
                     if (!part2.has(value.name)) {
-                        valueCell = new ValueCell(0, '0', path, value);
+                        valueCell = new ValueCell(0, path, value);
                         part2.set(value.name, valueCell)
                     }
-                    else //if (part2.get(value.name) instanceof ValueCell)
+                    else
                         valueCell = part2.get(value.name) as ValueCell;
 
                     col.valueCells.push(valueCell);
@@ -182,7 +182,7 @@ export class Pivot {
     private makeValueCell(_field: Field, _value: string | number | Date | null, path: Map<string | null, string | null>, data: Array<any>): Map<string, ValueCell> {
         let result: Map<string, ValueCell> = new Map();
         for (let value of this.options.values) {
-            let cell = new ValueCell(0, "", path, value);
+            let cell = new ValueCell(0, path, value);
             //cell.data = data;
             cell.value = value.compute(data);
             cell.text = value.getText(cell.value);
@@ -193,7 +193,7 @@ export class Pivot {
     }
 
     private makeHeaderCell(field: Field, value: string | number | Date | null, path: Map<string | null, string | null>, _data: Array<any>): HeaderCell {
-        let cell = new HeaderCell(value, value ? value.toString() : '', path, field, path.size);
+        let cell = new HeaderCell(value, path, field, path.size);
         return cell;
     }
 
@@ -231,7 +231,7 @@ export class Pivot {
             if (/^(1.?)*(0.?)*$/.test(array))//不要中间NULL或者中间非NULL
             {
                 let mapping = Array.from(temp.values());
-                let header = new Header(mapping.map(f => new HeaderCell(f.value, f.text, f.path, f.field, f.index)));
+                let header = new Header(mapping.map(f => new HeaderCell(f.value, f.path, f.field, f.index)));
                 header.path = path;
                 mapping.forEach(f => f.parent = header);
                 result.push(header);
@@ -245,7 +245,7 @@ export class Pivot {
                     cell = i[1] as HeaderCell;
                 }
                 else {
-                    cell = new HeaderCell(value, value, new Map(path).set(key, value), fields[0], path.size);
+                    cell = new HeaderCell(value, new Map(path).set(key, value), fields[0], path.size);
                 }
                 temp.set(fields[0].name, cell);
                 this.makeHeaders((i[1] as Map<string, any>), new Map(path).set(key, value), temp, result, fields.filter((_, i) => i > 0));
@@ -317,7 +317,7 @@ export class Pivot {
         }
     }
     public getDetails(path: Map<string | null, string | null>): Array<any> {
-        let details = this.data;
+        let details = this.view;
         for (let i of path) {
             if (i[0] != null && i[1] != null) {
                 let key: string = i[0] as string;

@@ -140,10 +140,9 @@ export default {
         },
     },
     mounted: function () {
-        let me = this;
-        this.$nextTick(() => {
-            me.form = this.$refs.inputRef;
-        })
+        setTimeout(() => {
+            this.form = this.$refs.inputRef;
+        }, 1)
     }
 }
 </script>
