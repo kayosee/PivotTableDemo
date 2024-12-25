@@ -17,6 +17,10 @@ import { Header } from "./Header";
 
 export class Pivot {
     options: PivotOptions;
+    pageNumber: number = 1;
+    pageSize: number = 50;
+    pageCount: number = 0;
+    activeRowHeaders:Array<Header>|null=null;
     data: Array<any> = [];
     view: Array<any> = [];
     cells: Array<Array<Cell>> = [];
@@ -32,9 +36,10 @@ export class Pivot {
         this.options = new PivotOptions({});
     }
     init(options: PivotOptions) {
+        this.pageSize = options.pageSize;
         this.options = options;
     }
-    calc() {
+    calc(pageNumber: number|null, pageSize: number|null) {
         let options = this.options;
         this.view = this.filter(this.data, options.filters);
 
@@ -62,12 +67,23 @@ export class Pivot {
             this.columnHeaders = [new Header([new HeaderCell(null, null, null, 0)])];
 
         this.sort();
-        this.makeCells();
+        if (this.options.pagination && pageNumber && pageSize) {
+            this.activeRowHeaders = this.page(pageNumber, pageSize);
+        }
+        else {
+            this.activeRowHeaders = this.rowHeaders;
+        }
+        this.makeCells(this.activeRowHeaders);
     }
     load(data: Array<object>) {
-
         this.data = this.convert(data, this.options.fields);
-        this.calc();
+        this.calc(1, this.pageSize);
+    }
+    public page(pageNumber: number, pageSize: number):Array<Header> {
+        this.pageCount = Math.ceil(this.rowHeaders.length / pageSize);
+        this.pageNumber = pageNumber;
+        this.pageSize = pageSize;
+        return Arrays.paginate(this.rowHeaders, pageSize, pageNumber)
     }
     private sort() {
         var sort = new Sort(this.columnHeaders);
@@ -82,9 +98,9 @@ export class Pivot {
         } sort.do();
     }
 
-    private makeCells() {
+    private makeCells(rowHeaders: Array<Header>) {
         this.cells = [];
-        for (let row of this.rowHeaders) {
+        for (let row of rowHeaders) {
             let path: Map<string | null, any> = new Map();
             let part1: Map<string | null, any> | ValueCell = this.cellMap;
 
@@ -256,7 +272,7 @@ export class Pivot {
     public moveField(from: Area, to: Area, toIndex: number, field: Field): boolean {
         var result = this.options.moveField(from, to, toIndex, field);
         if (result == true) {
-            this.calc();
+            this.calc(1, this.pageSize);
             if (to == Area.filter) {
                 (field as FilterField).constants = Arrays.distinct(this.data, field.name);
             }

@@ -62,6 +62,9 @@ export default {
 </template>
 
 <style scoped>
+.pivot-cell{
+    background-color: #fff;
+}
 .hidden {
     display: none
 }

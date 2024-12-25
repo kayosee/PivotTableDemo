@@ -16,11 +16,19 @@ export class PivotOptions {
     width: Number = 1200;
     height: Number = 600;
     autosize: boolean = true;
+    pageSize: number = 100;
+    pagination: boolean = false;
     nullValue: string = "(空白)";
     showFieldsPanel: ShowFieldsPanel = ShowFieldsPanel.right;
     constructor(options: any) {
         if (options.hasOwnProperty("nullValue"))
             this.nullValue = options["nullValue"];
+
+        if (options.hasOwnProperty("pagination"))
+            this.pagination = options["pagination"];
+
+        if (options.hasOwnProperty("pageSize"))
+            this.pageSize = options["pageSize"];
 
         if (options.hasOwnProperty("autosize"))
             this.autosize = options["autosize"];

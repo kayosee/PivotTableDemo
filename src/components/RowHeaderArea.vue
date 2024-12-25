@@ -48,7 +48,7 @@ export default {
 
 <template>
     <table ref="table" class="pivot-frame">
-        <tr class="row" v-for="(header) in pivot.rowHeaders" :key="header.id" :class="{'total':header.collapseable()}">
+        <tr class="row" v-for="(header) in pivot.activeRowHeaders" :key="header.id" :class="{'total':header.collapseable()}">
             <td class="pivot-cell" v-for="(cell) in header.trim()" :key="cell.id" :colspan="cell.rowspan"
                 :class="{ 'hidden': cell.hidden }">
                 <div v-if="cell.value !== null">{{ cell.value }}</div>
@@ -87,6 +87,7 @@ export default {
 
 .pivot-cell {
     white-space: nowrap;
+    background-color: #fafafa;
 }
 
 .pivot-frame {

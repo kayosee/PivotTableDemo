@@ -24,9 +24,6 @@ export default {
         let scrollLeft = ref(0);
         let rowAreaWidth = ref(0);
 
-        let pageSize=ref(0);
-        let currentPage=ref(0);
-
         let table: any;
         return {
             pivot,
@@ -37,8 +34,6 @@ export default {
             scrollTop,
             scrollLeft,
             rowAreaWidth,
-            pageSize,
-            currentPage,
         }
     },
     methods: {
@@ -64,10 +59,12 @@ export default {
         load: function (data: Array<any>) {
             this.pivot.load(data);
         },
-        pageSizeChange:function(){
-
+        pageSizeChange: function (size: number) {
+            this.pivot.page(1, size);
         },
-        currentPageChange:function(){}
+        pageNumChange: function (num: number) {
+            this.pivot.page(num, this.pivot.pageSize);
+        }
     },
     props: {
         options: {
@@ -113,11 +110,11 @@ export default {
                 </div>
             </td>
         </tr>
-        <tr><td colspan="3" style="padding:3px">
-            <el-pagination v-model:current-page="currentPage" :page-size="100" :size="pageSize" layout="total, sizes, prev, pager, next, jumper"
-      :total="pivot.cells.length"
+        <tr v-if="pivot.options.pagination"><td colspan="3" style="padding:3px">
+            <el-pagination size="default" layout="total, sizes, prev, pager, next, jumper"
+       :page-size="pivot.pageSize" :page-count="pivot.pageCount" :current-page="pivot.pageNumber" :total="pivot.rowHeaders.length"
       @size-change="pageSizeChange"
-      @current-change="currentPageChange"
+      @current-change="pageNumChange"
     />
         </td></tr>
     </table>

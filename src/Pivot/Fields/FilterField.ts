@@ -15,7 +15,7 @@ export class FilterField extends Field {
             else if ([Comparison.contains, Comparison.notContains].find(f => f == method))
                 return (func)?.(this.type, f[this.name], this.list);
             else if ([Comparison.like, Comparison.notLike].find(f => f == method))
-                return (func)?.(f[this.name], this.critera);
+                return (func)?.(this.type, f[this.name], this.critera);
             return (func)?.(this.type, f[this.name], this.critera);
         }
     }
@@ -38,7 +38,7 @@ export class FilterField extends Field {
         [Comparison.contains, function (_type: DataType, a: any, b: Array<number | Date | string>) { return b.findIndex(f => f == a) >= 0; }],
         [Comparison.notContains, function (_type: DataType, a: any, b: Array<number | Date | string>) { return b.findIndex(f => f == a) == -1; }]
     ])
-    constructor(name: string, title: string, type: DataType, index: number, style: string | Function | null, comparison: string | Function, critera: string | number | Date | null, start: number | Date | null, end: number | Date | null, list: Array<number | Date | string> | null,constants:Array<string>|null) {
+    constructor(name: string, title: string, type: DataType, index: number, style: string | Function | null, comparison: string | Function, critera: string | number | Date | null, start: number | Date | null, end: number | Date | null, list: Array<number | Date | string> | null, constants: Array<string> | null) {
         super(name, title, type, index, style, null, null);
         if (typeof (comparison) == 'string')
             this.comparison = comparison as Comparison;
@@ -49,7 +49,7 @@ export class FilterField extends Field {
         this.start = start;
         this.end = end;
         this.list = list;
-        this.constants=constants;
+        this.constants = constants;
     }
 }
 
