@@ -70,10 +70,10 @@ export default {
 }
 
 .border-right {
-    border-right: 1px solid gray;
+    border-right: 1px solid lightgray;
 }
 
 .border-bottom {
-    border-bottom: 1px solid gray;
+    border-bottom: 1px solid lightgray;
 }
 </style>

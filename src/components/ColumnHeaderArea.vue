@@ -98,7 +98,7 @@ export default {
 </template>
 <style scoped>
 .border{
-   border-right:  1px solid grey !important
+   border-right:  1px solid lightgrey !important
 }
 .placeholder {
     display: inline-block;
@@ -119,7 +119,7 @@ export default {
     padding: 0;
 }
 .header-row .even {
-    border-top: 1px solid;
+    border-top: 1px solid lightgray;
 }
 
 .hidden {

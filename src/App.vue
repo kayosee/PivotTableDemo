@@ -56,7 +56,7 @@ let options = ref(new PivotOptions({
 onMounted(() => {
 
   pivotTable.value.init(options);
-  fetch('http://localhost/data.json').then(f => f.json()).
+  fetch('./assets/data.json').then(f => f.json()).
     then((data) =>
       pivotTable.value.load(data));
 })
