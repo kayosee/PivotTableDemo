@@ -1,5 +1,5 @@
 import { SortOrder } from "../Enums/SortOrder";
 
-export interface ISortable{
-    sort:SortOrder;
+export interface ISortable {
+    sort: SortOrder;
 }

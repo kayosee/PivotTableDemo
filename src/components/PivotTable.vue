@@ -60,10 +60,10 @@ export default {
             this.pivot.load(data);
         },
         pageSizeChange: function (size: number) {
-            this.pivot.page(1, size);
+            this.pivot.refresh(1, size);
         },
         pageNumChange: function (num: number) {
-            this.pivot.page(num, this.pivot.pageSize);
+            this.pivot.refresh(num, this.pivot.pageSize);
         }
     },
     props: {

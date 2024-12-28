@@ -119,7 +119,7 @@ export default {
         },
         open: function (field: FilterField, handler: Function) {
             this.show = true;
-            this.field = new FilterField(field.name, field.title, field.type, field.index, field.style, field.comparison, field.critera, field.start, field.end, field.list, field.constants);
+            this.field = field.clone();
             this.handler = handler;
         },
         handleClose: function (tag: string | Date | number) {

@@ -66,9 +66,9 @@ export default {
         },
         open: function (field: ColumnField | RowField | Field, handler: Function) {
             if (field instanceof RowField || field instanceof ColumnField)
-                this.field = new ColumnField(field.name, field.title, field.type, field.index, field.style, field.format, field.formatter, field.sort);
+                this.field = field.clone();
             else
-                this.field = new ColumnField(field.name, field.title, field.type, field.index, field.style, field.format, field.formatter, "asc");
+                this.field = new ColumnField(field.name, field.title, field.type, field.index, field.style, field.format, field.formatter, field.fraction, "asc");
 
             this.handler = handler;
             this.show = true;

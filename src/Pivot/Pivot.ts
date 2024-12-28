@@ -20,7 +20,7 @@ export class Pivot {
     pageNumber: number = 1;
     pageSize: number = 50;
     pageCount: number = 0;
-    activeRowHeaders:Array<Header>|null=null;
+    activeRowHeaders: Array<Header> | null = null;
     data: Array<any> = [];
     view: Array<any> = [];
     cells: Array<Array<Cell>> = [];
@@ -35,11 +35,11 @@ export class Pivot {
     constructor() {
         this.options = new PivotOptions({});
     }
-    init(options: PivotOptions) {
+    public init(options: PivotOptions) {
         this.pageSize = options.pageSize;
         this.options = options;
     }
-    calc(pageNumber: number|null, pageSize: number|null) {
+    private calc(pageNumber: number | null, pageSize: number | null) {
         let options = this.options;
         this.view = this.filter(this.data, options.filters);
 
@@ -67,6 +67,13 @@ export class Pivot {
             this.columnHeaders = [new Header([new HeaderCell(null, null, null, 0)])];
 
         this.sort();
+        this.refresh(pageNumber, pageSize);
+    }
+    public load(data: Array<object>) {
+        this.data = this.convert(data, this.options.fields);
+        this.calc(1, this.pageSize);
+    }
+    public refresh(pageNumber: number | null, pageSize: number | null) {
         if (this.options.pagination && pageNumber && pageSize) {
             this.activeRowHeaders = this.page(pageNumber, pageSize);
         }
@@ -75,11 +82,7 @@ export class Pivot {
         }
         this.makeCells(this.activeRowHeaders);
     }
-    load(data: Array<object>) {
-        this.data = this.convert(data, this.options.fields);
-        this.calc(1, this.pageSize);
-    }
-    public page(pageNumber: number, pageSize: number):Array<Header> {
+    private page(pageNumber: number, pageSize: number): Array<Header> {
         this.pageCount = Math.ceil(this.rowHeaders.length / pageSize);
         this.pageNumber = pageNumber;
         this.pageSize = pageSize;
@@ -312,7 +315,7 @@ export class Pivot {
             this.onPropertyChanged(false);
     }
 
-    public hideCells(path: Map<string | null, any>, root: Map<string | null, any>, hidden: boolean) {
+    private hideCells(path: Map<string | null, any>, root: Map<string | null, any>, hidden: boolean) {
         let temp = root;
         for (let i of path) {
             if (temp.has(i[1]))
@@ -321,7 +324,7 @@ export class Pivot {
         let tree = [...temp].filter(f => f[0] != null);
         this.doHide(new Map(tree), hidden);
     }
-    public doHide(tree: Map<string | null, any>, hidden: boolean) {
+    private doHide(tree: Map<string | null, any>, hidden: boolean) {
         for (let i of tree) {
             if (i[1] instanceof Map)
                 this.doHide(i[1], hidden);

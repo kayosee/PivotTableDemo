@@ -86,7 +86,7 @@ export default {
             });
         },
         open: function (field: ValueField, handler: Function, keys: Array<Field>) {
-            this.field = new ValueField(field.name, field.title, field.type, field.index, field.style, field.aggregator, field.distinct, field.keys, field.format, field.formatter, field.sort);
+            this.field = field.clone();
             this.handler = handler;
             this.keys = keys;
             this.show = true;

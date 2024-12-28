@@ -7,6 +7,7 @@ let pivotTable: any = ref(null);
 let options = ref(new PivotOptions({
   height: 500,
   width: 1200,
+  pagination:false,
   showFieldsPanel: 'right',
   fields: [
     { name: 'item_code', title: '代码', type: 'string' },
@@ -56,7 +57,7 @@ let options = ref(new PivotOptions({
 onMounted(() => {
 
   pivotTable.value.init(options);
-  fetch('./assets/data.json').then(f => f.json()).
+  fetch('http://localhost/data.json').then(f => f.json()).
     then((data) =>
       pivotTable.value.load(data));
 })

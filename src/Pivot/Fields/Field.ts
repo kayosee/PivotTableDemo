@@ -1,8 +1,9 @@
 import moment from "moment";
 import { DataType } from "../Enums/DataType";
 import { ValueFormat } from "../Enums/ValueFormat";
+import { IClone } from "../IClone";
 
-export class Field {
+export class Field implements IClone<Field> {
     name: string;
     title: string;
     type: DataType;
@@ -11,7 +12,7 @@ export class Field {
 
     format: ValueFormat | null = null;
     formatter: Function | null = null;
-    fraction: number = 2;
+    fraction: number | null = null;
     getStyle(value: any): string {
         if (typeof (this.style) == 'function')
             return this.style(value);
@@ -75,7 +76,7 @@ export class Field {
                 return value;
         }
     }
-    constructor(name: string, title: string, type: DataType | string, index: number, style: string | Function | null, format: string | null, formatter: Function | null) {
+    constructor(name: string, title: string, type: DataType | string, index: number, style: string | Function | null, format: string | null, formatter: Function | null, fraction: number | null) {
         this.name = name;
         this.title = title;
         this.index = index;
@@ -91,5 +92,11 @@ export class Field {
             this.type = type as DataType;
         else
             this.type = type;
+
+        this.fraction = fraction;
+    }
+    clone(): Field {
+        let copy = new Field(this.name, this.title, this.type, this.index, this.style, this.format, this.formatter, this.fraction);
+        return copy;
     }
 }

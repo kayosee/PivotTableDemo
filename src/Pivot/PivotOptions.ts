@@ -46,7 +46,7 @@ export class PivotOptions {
             for (let i = 0; i < options.fields.length; i++) {
                 let field = options.fields[i];
                 this.fields.push(
-                    new Field(field.name, field.title, field.type, i, field.style, field.format, field.formatter)
+                    new Field(field.name, field.title, field.type, i, field.style, field.format, field.formatter, field.fraction)
                 );
             }
 
@@ -56,7 +56,7 @@ export class PivotOptions {
                 if (field == null) {
                     throw FIELD_NOT_EXISTS;
                 }
-                this.columns.push(new ColumnField(field.name, field.title, field.type, i, column.style, column.format, column.formatter, column.sort));
+                this.columns.push(new ColumnField(field.name, field.title, field.type, i, column.style, column.format, column.formatter, column.fraction, column.sort));
             }
 
             for (let i = 0; i < options.rows.length; i++) {
@@ -65,7 +65,7 @@ export class PivotOptions {
                 if (field == null) {
                     throw FIELD_NOT_EXISTS;
                 }
-                this.rows.push(new RowField(field.name, field.title, field.type, i, row.style, row.format, row.formatter, row.sort));
+                this.rows.push(new RowField(field.name, field.title, field.type, i, row.style, row.format, row.formatter, row.fraction, row.sort));
             }
 
             for (let i = 0; i < options.values.length; i++) {
@@ -74,7 +74,7 @@ export class PivotOptions {
                 if (field == null) {
                     throw FIELD_NOT_EXISTS;
                 }
-                this.values.push(new ValueField(field.name, field.title, field.type, i, value.style, value.aggregator, value.distinct, value.keys, value.format, value.formatter, value.sort));
+                this.values.push(new ValueField(field.name, field.title, field.type, i, value.style, value.format, value.formatter, value.fraction, value.aggregator, value.distinct, value.keys, value.sort));
             }
 
             for (let i = 0; i < options.filters.length; i++) {
