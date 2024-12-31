@@ -119,7 +119,7 @@ export default {
         },
         open: function (field: FilterField, handler: Function) {
             this.show = true;
-            this.field = field.clone();
+            this.field = FilterField.clone(field);
             this.handler = handler;
         },
         handleClose: function (tag: string | Date | number) {

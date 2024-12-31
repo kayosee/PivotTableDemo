@@ -1,5 +1,5 @@
-import { FIELD_NOT_EXISTS, OUT_OF_RANGE } from './locale';
-import { Marshal } from './Utils/Marshal';
+import { FIELD_NOT_EXISTS, OUT_OF_RANGE } from '../locale';
+import { Marshal } from './Marshal';
 export class DataTable {
     columns: Array<string>;
     data: Array<any>;

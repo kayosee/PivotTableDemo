@@ -66,8 +66,10 @@ export default {
             });
         },
         open: function (field: RowField | ColumnField | Field, handler: Function) {
-            if (field instanceof ColumnField || field instanceof RowField)
-                this.field = field.clone();
+            if (field instanceof RowField)
+                this.field = RowField.clone(field);
+            else if(field instanceof ColumnField)
+                this.field = ColumnField.clone(field);
             else
                 this.field = new RowField(field.name, field.title, field.type, field.index, field.style, field.format, field.formatter, field.fraction, "asc");
 

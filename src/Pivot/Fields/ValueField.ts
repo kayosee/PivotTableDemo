@@ -1,7 +1,7 @@
 import { Field } from "./Field";
 import { DataType } from "../Enums/DataType";
 import { Aggregator } from "../Enums/Aggregator";
-import { ISortable } from "./ISortable";
+import { ISortable } from "../ISortable";
 import { SortOrder } from "../Enums/SortOrder";
 import { Arrays } from "../Utils/Arrays";
 
@@ -69,7 +69,7 @@ export class ValueField extends Field implements ISortable {
             this.sort = SortOrder.asc;
         this.fraction = fraction ?? 2;
     }
-    clone(): ValueField {
-        return new ValueField(this.name, this.title, this.type, this.index, this.style, this.format, this.formatter, this.fraction, this.aggregator, this.distinct, this.keys, this.sort);
+    static clone(source:any): ValueField {
+        return new ValueField(source.name, source.title, source.type, source.index, source.style, source.format, source.formatter, source.fraction, source.aggregator, source.distinct, source.keys, source.sort);
     }
 }

@@ -1,9 +1,8 @@
 import moment from "moment";
 import { DataType } from "../Enums/DataType";
 import { ValueFormat } from "../Enums/ValueFormat";
-import { IClone } from "../IClone";
 
-export class Field implements IClone<Field> {
+export class Field {
     name: string;
     title: string;
     type: DataType;
@@ -95,8 +94,7 @@ export class Field implements IClone<Field> {
 
         this.fraction = fraction;
     }
-    clone(): Field {
-        let copy = new Field(this.name, this.title, this.type, this.index, this.style, this.format, this.formatter, this.fraction);
-        return copy;
+    static clone(source: any): Field {
+        return new Field(source.name, source.title, source.type, source.index, source.style, source.format, source.formatter, source.fraction);
     }
 }

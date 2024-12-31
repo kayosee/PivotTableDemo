@@ -51,8 +51,8 @@ export class FilterField extends Field {
         this.list = list;
         this.constants = constants;
     }
-    clone(): FilterField {
-       return new FilterField(this.name, this.title, this.type, this.index, this.style, this.comparison, this.critera, this.start, this.end, this.list, this.constants);       
+    static clone(source:any): FilterField {
+       return new FilterField(source.name, source.title, source.type, source.index, source.style, source.comparison, source.critera, source.start, source.end, source.list, source.constants);       
     }
 }
 

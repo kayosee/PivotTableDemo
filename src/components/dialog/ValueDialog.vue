@@ -86,7 +86,7 @@ export default {
             });
         },
         open: function (field: ValueField, handler: Function, keys: Array<Field>) {
-            this.field = field.clone();
+            this.field = ValueField.clone(field);
             this.handler = handler;
             this.keys = keys;
             this.show = true;

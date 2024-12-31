@@ -1,7 +1,7 @@
 import { Field } from "./Field";
 import { DataType } from "../Enums/DataType";
 import { SortOrder } from "../Enums/SortOrder";
-import { ISortable } from "./ISortable";
+import { ISortable } from "../ISortable";
 
 export class RowField extends Field implements ISortable {
     sort: SortOrder;
@@ -13,7 +13,7 @@ export class RowField extends Field implements ISortable {
         else
             this.sort = SortOrder.asc;
     }
-    clone(): RowField {
-        return new RowField(this.name, this.title, this.type, this.index, this.style, this.format, this.formatter, this.fraction, this.sort);
+    static clone(source:any): RowField {
+        return new RowField(source.name, source.title, source.type, source.index, source.style, source.format, source.formatter, source.fraction, source.sort);
     }
 }
